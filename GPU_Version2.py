@@ -1,4 +1,4 @@
-rom __future__ import print_function
+from __future__ import print_function
 import os
 
 import glob
@@ -31,7 +31,7 @@ from tensorflow.keras.models import Model, Sequential
 import math
 
 GLOBAL_BATCH_SIZE = 64
-nb_epochs = 1 #60 #Total Epochs
+nb_epochs = 60 #60 #Total Epochs
 batch_size = 64 #batch size
 latent_size = 256 #latent vector size
 verbose = True
@@ -681,7 +681,7 @@ for epoch in range(nb_epochs):
         #Training
         #add Trainfiles, nb_train_batches, progress_bar, daxis, daxis2, loss_ftn, combined
         for batch in dist_dataset:
-
+            file_time = time.time()
             this_batch_size =128 #not necessary can be removed
             
 
