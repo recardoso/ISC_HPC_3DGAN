@@ -369,6 +369,10 @@ def GetDataAngleParallel(dataset, xscale =1, xpower=1, yscale = 100, angscale=1,
     if xpower !=1.:
         X = np.power(X, xpower)
 
+    Y = [[el] for el in Y]
+    ang = [[el] for el in ang]
+    ecal = [[el] for el in ecal]
+
     final_dataset = {'X': X,'Y': Y, 'ang': ang, 'ecal': ecal}
 
     return final_dataset
@@ -459,7 +463,7 @@ def Train_steps(dataset):
     generated_images = generator(generator_ip, training=False)
 
     # Train discriminator first on real batch 
-    fake_batch = gan.BitFlip(np.ones(batch_size_per_replica).astype(np.float32))
+    fake_batch = BitFlip(np.ones(batch_size_per_replica).astype(np.float32))
     fake_batch = [[el] for el in fake_batch]
     labels = [fake_batch, energy_batch, ang_batch, ecal_batch]
 
@@ -478,7 +482,7 @@ def Train_steps(dataset):
     optimizer_discriminator.apply_gradients(zip(gradients, discriminator.trainable_variables)) # model.trainable_variables or  model.trainable_weights
 
     #Train discriminato on the fake batch
-    fake_batch = gan.BitFlip(np.zeros(batch_size_per_replica).astype(np.float32))
+    fake_batch = BitFlip(np.zeros(batch_size_per_replica).astype(np.float32))
     fake_batch = [[el] for el in fake_batch]
     labels = [fake_batch, energy_batch, ang_batch, ecal_batch]
 
@@ -662,7 +666,7 @@ for epoch in range(nb_epochs):
         print ('Loading Data from .....', Trainfiles[nb_file])
         
         # Get the dataset from the trainfile
-        dataset = tfconvert.RetrieveTFRecord(Trainfiles[nb_file])
+        dataset = RetrieveTFRecord(Trainfiles[nb_file])
 
         # Get the train values from the dataset
         dataset = GetDataAngleParallel(dataset, xscale=xscale, xpower=xpower, angscale=angscale, angtype=angtype, thresh=thresh, daxis=daxis)
