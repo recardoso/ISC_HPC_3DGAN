@@ -30,6 +30,8 @@ from tensorflow.keras.layers import (UpSampling3D, Conv3D, ZeroPadding3D, Averag
 from tensorflow.keras.models import Model, Sequential
 import math
 
+import json
+
 GLOBAL_BATCH_SIZE = 64
 nb_epochs = 60 #60 #Total Epochs
 batch_size = 64 #batch size
@@ -57,6 +59,33 @@ g_weights='params_generator_epoch_'
 d_weights='params_discriminator_epoch_'
 
 tlab = False
+
+def get_parser():
+    parser = argparse.ArgumentParser(description='3D GAN Params')
+    parser.add_argument('--multi_node', action='store', default=False)
+    parser.add_argument('--workers', nargs='+', default='') #use like this --workers 10.1.10.58:12345 10.1.10.250:12345
+    parser.add_argument('--index', action='store', type=int, default=0)
+    return parser
+
+parser = get_parser()
+params = parser.parse_args()
+
+multi_node = params.multi_node
+
+if multi_node:
+    workers = params.workers
+    index = params.index
+
+    print(multi_node)
+    print(workers)
+    print(index)
+
+    #tf_config
+    os.environ["TF_CONFIG"] = json.dumps({
+        'cluster': {'worker': workers},#["10.1.10.58:12345", "10.1.10.250:12345"]},
+        'task': {'type': 'worker', 'index': index}
+    })
+
 
 # ## Models
 
@@ -286,7 +315,8 @@ energies = [0, 110, 150, 190, 1]
 
 #Define Strategy and models
 strategy = tf.distribute.MirroredStrategy()
-#strategy = tf.distribute.experimental.MultiWorkerMirroredStrategy(tf.distribute.experimental.CollectiveCommunication.NCCL)
+if multi_node:
+    strategy = tf.distribute.experimental.MultiWorkerMirroredStrategy(tf.distribute.experimental.CollectiveCommunication.NCCL)
 print ('Number of devices: {}'.format(strategy.num_replicas_in_sync))
 
 BATCH_SIZE_PER_REPLICA = batch_size
@@ -767,7 +797,7 @@ for epoch in range(nb_epochs):
         print ('Loading Data from .....', Testfiles[nb_file])
         
         # Get the dataset from the Testfile
-        dataset = tfconvert.RetrieveTFRecord(Testfiles[nb_file])
+        dataset = RetrieveTFRecord(Testfiles[nb_file])
         #dataset = h5py.File(Testfiles[0],'r') #to read h5py
 
         # Get the Test values from the dataset
@@ -854,20 +884,6 @@ for epoch in range(nb_epochs):
     pickle.dump({'train': train_history, 'test': test_history}, open(pklfile, 'wb'))
     
     print('train-loss:' + str(train_history['generator'][-1][0]))
-
-    with open('/eos/user/d/dgolubov/tfresults/metrics_custom.txt', 'w') as metrics_wf:
-        metrics_wf.write('epoch-time=' + str(epoch_time))
-        for i in range(len(d.metrics_names)):
-            for model_kind in ['generator', 'discriminator']:
-                metrics_wf.write(model_kind + '-train-' + d.metrics_names[i] + '=' + str(train_history[model_kind][-1][i]))
-                metrics_wf.write(model_kind + '-test-' + d.metrics_names[i] + '=' + str(train_history[model_kind][-1][i]))
-
-    with open('/model_outputs/metrics_custom.txt', 'w') as metrics_wf:
-        metrics_wf.write('epoch-time=' + str(epoch_time))
-        for i in range(len(d.metrics_names)):
-            for model_kind in ['generator', 'discriminator']:
-                metrics_wf.write(model_kind + '-train-' + d.metrics_names[i] + '=' + str(train_history[model_kind][-1][i]) + '\n')
-                metrics_wf.write(model_kind + '-test-' + d.metrics_names[i] + '=' + str(train_history[model_kind][-1][i]) + '\n')
 
     # #--------------------------------------------------------------------------------------------
     # #------------------------------ Analysis ----------------------------------------------------
