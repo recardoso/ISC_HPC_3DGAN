@@ -314,7 +314,8 @@ loss_weights=[3, 0.1, 25, 0.1]
 energies = [0, 110, 150, 190, 1]
 
 #Define Strategy and models
-strategy = tf.distribute.MirroredStrategy()
+if not multi_node:
+    strategy = tf.distribute.MirroredStrategy()
 if multi_node:
     strategy = tf.distribute.experimental.MultiWorkerMirroredStrategy(tf.distribute.experimental.CollectiveCommunication.NCCL)
 print ('Number of devices: {}'.format(strategy.num_replicas_in_sync))
