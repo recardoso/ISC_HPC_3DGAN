@@ -42,19 +42,31 @@ parser.add_argument('--learning_rate', type=float, default=0.1,
                         help='Learning rate')
 parser.add_argument('--is_full_training', type=int, default=0,
                         help='Load one file, or all files')
+parser.add_argument('--use-eos', type=int, default=0,
+                        help='Use EOS or s3 bucket to load files')
 args = parser.parse_args()
 
 print(args)
 print(args.nb_epochs)
 
+os.environ['S3_ENDPOINT'] = 'https://s3.cern.ch'
+print(os.environ['S3_ENDPOINT'])
+
 nb_epochs = args.nb_epochs #60 #Total Epochs
 is_full_training = args.is_full_training
+use_eos = args.use_eos
+
 GLOBAL_BATCH_SIZE = 64
 batch_size = 64 #batch size
 latent_size = 256 #latent vector size
 verbose = True
-datapath = '/eos/user/d/dgolubov/tfrecords/public/*.tfrecords'# Data path
-outpath = '/eos/user/d/dgolubov/tfresults/'# training output
+if use_eos:
+    datapath = '/eos/user/d/dgolubov/tfrecords/public/*.tfrecords'# Data path
+    outpath = '/eos/user/d/dgolubov/tfresults/'# training output
+else:
+    datapath = 's3://swift/v1/gan-bucket/tfrecords/'# Data path
+    outpath = './'# training output
+
 nEvents = 400000# maximum number of events used in training
 ascale = 1 # angle scale
 yscale = 100 # scaling energy«
@@ -292,6 +304,15 @@ config = tf.compat.v1.ConfigProto(log_device_placement=True)
 config.gpu_options.allow_growth = True
 main_session = tf.compat.v1.InteractiveSession(config=config)
 
+if not os.path.exists(outpath + 'weights/3dgan_weights_gan_training/'):
+    os.makedirs(outpath + 'weights/3dgan_weights_gan_training/')
+
+if not os.path.exists(outpath + 'results/3dgan_history_gan_training/'):
+    os.makedirs(outpath + 'results/3dgan_history_gan_training/')
+
+if not os.path.exists(outpath + 'weights/3dgan_analysis_gan_training/'):
+    os.makedirs(outpath + 'results/3dgan_analysis_gan_training/')
+
 WeightsDir = outpath + 'weights/3dgan_weights_' + name
 pklfile = outpath + 'results/3dgan_history_' + name + '.pkl'# loss history
 resultfile = outpath + 'results/3dgan_analysis' + name + '.pkl'# optimization metric history   
@@ -450,9 +471,12 @@ else:
     
 if is_full_training:
     Trainfiles, Testfiles = DivideFiles(datapath, f, datasetnames=["ECAL"], Particles =[particle])
-else:
+elif use_eos:
     Trainfiles = ['/eos/user/d/dgolubov/tfrecords/public/Ele_VarAngleMeas_100_200_000.tfrecords']
     Testfiles = ['/eos/user/d/dgolubov/tfrecords/public/Ele_VarAngleMeas_100_200_001.tfrecords']
+else:
+    Trainfiles = ['s3://swift/v1/gan-bucket/tfrecords/Ele_VarAngleMeas_100_200_000.tfrecords']
+    Testfiles = ['s3://swift/v1/gan-bucket/tfrecords/Ele_VarAngleMeas_100_200_001.tfrecords']
 
 print(Trainfiles)
 print(Testfiles)
@@ -880,7 +904,7 @@ for epoch in range(nb_epochs):
     
     metrics_names = ['loss', 'binary-loss', 'mean-loss-1', 'mae-loss', 'mean-loss-2']
 
-    with open('/eos/user/d/dgolubov/tfresults/metrics_custom.txt', 'w') as metrics_wf:
+    with open('/model_outputs/metrics_custom.txt', 'w') as metrics_wf:
         metrics_wf.write('train-epoch-time=' + str(epoch_train_time) + '\n')
         metrics_wf.write('test-epoch-time=' + str(epoch_time) + '\n')
         for i in range(len(metrics_names)):
@@ -888,14 +912,5 @@ for epoch in range(nb_epochs):
                 metrics_wf.write(model_kind + '-train-' + metrics_names[i] + '=' + str(train_history[model_kind][-1][i]) + '\n')
                 metrics_wf.write(model_kind + '-test-' + metrics_names[i] + '=' + str(test_history[model_kind][-1][i]) + '\n')
 
-    os.system('cp /eos/user/d/dgolubov/tfresults/metrics_custom.txt /model_outputs/metrics_custom.txt')
-    
-    # #--------------------------------------------------------------------------------------------
-    # #------------------------------ Analysis ----------------------------------------------------
-    # #--------------------------------------------------------------------------------------------
-
-    
-    # # if a short analysis is to be performed for each epoch
-    # if analyse:
-    #     print('analysing..........')
-
+    if use_eos:
+        os.system('cp /model_outputs/metrics_custom.txt /eos/user/d/dgolubov/tfresults/metrics_custom.txt')
