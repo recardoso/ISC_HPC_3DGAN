@@ -47,6 +47,11 @@ spec:
       feasibleSpace:
         min: 0
         max: 0
+    - name: --use-eos
+      parameterType: int
+      feasibleSpace:
+        min: 0
+        max: 0
   trialTemplate:
     goTemplate:
       rawTemplate: |-
