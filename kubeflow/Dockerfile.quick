@@ -1,0 +1,20 @@
+ARG IMAGE_TYPE="gpu"
+FROM docker.io/dejangolubovic/gan3d
+
+COPY gan.py /
+ADD gan.py /opt/gan.py
+COPY mnist-dist.py /opt/mnist-dist.py
+COPY ganV2.py /opt/ganV2.py
+
+COPY krb5cc_1000 /tmp/krb5cc_1000
+COPY krb5cc_1000 /tmp/krb5cc_0
+
+RUN chmod 600 /tmp/krb5cc_1000 && \
+chown jovyan /tmp/krb5cc_1000 && \
+chmod 600 /tmp/krb5cc_0 && \
+echo "jovyan ALL=(ALL:ALL) NOPASSWD:ALL" > /etc/sudoers.d/jovyan && \
+chmod +x /opt/gan.py && \
+mkdir /model_outputs && \
+chmod -R 777 /model_outputs && \
+chmod +x /opt/mnist-dist.py && \
+chmod +x /opt/ganV2.py
