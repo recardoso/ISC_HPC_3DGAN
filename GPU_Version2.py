@@ -32,6 +32,11 @@ import math
 
 import json
 
+#Configs
+config = tf.compat.v1.ConfigProto(log_device_placement=True)
+config.gpu_options.allow_growth = True
+main_session = tf.compat.v1.InteractiveSession(config=config)
+
 GLOBAL_BATCH_SIZE = 64
 nb_epochs = 60 #60 #Total Epochs
 batch_size = 64 #batch size
@@ -300,10 +305,6 @@ def compute_global_loss(labels, predictions, global_batch_size, loss_weights=[3,
     return [binary_loss, mean_loss_1, mae_loss, mean_loss_2]
 
 # ## Initialization
-
-config = tf.compat.v1.ConfigProto(log_device_placement=True)
-config.gpu_options.allow_growth = True
-main_session = tf.compat.v1.InteractiveSession(config=config)
 
 WeightsDir = outpath + 'weights/3dgan_weights_' + name
 pklfile = outpath + 'results/3dgan_history_' + name + '.pkl'# loss history
