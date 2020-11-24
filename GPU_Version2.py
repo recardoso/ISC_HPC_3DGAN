@@ -849,6 +849,10 @@ for epoch in range(nb_epochs):
         #dataset = tf.data.Dataset.from_tensor_slices(dataset).batch(batch_size)
         dataset = tf.data.Dataset.from_tensor_slices(dataset).batch(batch_size, drop_remainder=True)
 
+        options = tf.data.Options()
+        options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
+        dataset = dataset.with_options(options)
+
         dist_dataset = strategy.experimental_distribute_dataset(dataset)
 
         # Testing
