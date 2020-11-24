@@ -740,6 +740,11 @@ for epoch in range(nb_epochs):
         #create the dataset with tensors from the train values, and batch it using the global batch size
         dataset = tf.data.Dataset.from_tensor_slices(dataset).batch(batch_size, drop_remainder=True)
         
+        options = tf.data.Options()
+        options.experimental_distribute.auto_shard_policy = AutoShardPolicy.DATA
+        dataset = dataset.with_options(options)
+
+
         #distribute the dataset
         dist_dataset = strategy.experimental_distribute_dataset(dataset)
 
