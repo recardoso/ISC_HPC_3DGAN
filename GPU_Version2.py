@@ -616,7 +616,8 @@ def Test_steps(dataset):
     trick = np.ones(batch_size_per_replica).astype(np.float32) #original doest have astype
     fake_batch = [[el] for el in trick]
     labels = [fake_batch, energy_batch, ang_batch, ecal_batch]
-    gen_eval = combined(generator_ip, training=False)
+    generated_images = generator(generator_ip ,training= False)
+    gen_eval = discriminator(generated_images , training=False)#combined(generator_ip, training=False)
     
     gen_eval_loss = compute_global_loss(labels, gen_eval, batch_size, loss_weights=loss_weights)
 
@@ -692,21 +693,21 @@ with strategy.scope():
     optimizer_generator = RMSprop(lr)
   
     
-with strategy.scope():
-    latent = Input(shape=(latent_size, ), name='combined_z')   
-    fake_image = generator( latent)
-    discriminator.trainable = False
-    fake, aux, ang, ecal = discriminator(fake_image) #remove add_loss
-
-    combined = Model(
-        inputs=[latent],
-        outputs=[fake, aux, ang, ecal], # remove add_loss
-        name='combined_model'
-    )
-    
-    combined.compile()
-
-    discriminator.trainable = True
+#with strategy.scope():
+#    latent = Input(shape=(latent_size, ), name='combined_z')   
+#    fake_image = generator( latent)
+#    discriminator.trainable = False
+#    fake, aux, ang, ecal = discriminator(fake_image) #remove add_loss
+#
+#    combined = Model(
+#        inputs=[latent],
+#        outputs=[fake, aux, ang, ecal], # remove add_loss
+#        name='combined_model'
+#   )
+#    
+#    combined.compile()
+#
+#    discriminator.trainable = True
 
 # Start training
 for epoch in range(nb_epochs):
