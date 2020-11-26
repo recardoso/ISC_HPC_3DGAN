@@ -71,6 +71,8 @@ def get_parser():
     parser.add_argument('--workers', nargs='+', default='') #use like this --workers 10.1.10.58:12345 10.1.10.250:12345
     parser.add_argument('--index', action='store', type=int, default=0)
     parser.add_argument('--use_gs', action='store', default=False)
+    parser.add_argument('--datapath', action='store', default='')
+    parser.add_argument('--outpath', action='store', default='')
     return parser
 
 parser = get_parser()
@@ -78,6 +80,11 @@ params = parser.parse_args()
 
 multi_node = params.multi_node
 use_gs = params.use_gs
+
+if not params.datapath == '':
+    datapath = params.datapath
+if not params.outpath == '':
+    outpath = params.outpath
 
 if multi_node:
     workers = params.workers
