@@ -454,6 +454,40 @@ def RetrieveTFRecord(recorddatapaths):
 
     return dataset
 
+def RetrieveTFRecordpreprocessing(recorddatapaths, batch_size):
+    recorddata = tf.data.TFRecordDataset(recorddatapaths)
+
+    #ds_size = sum(1 for _ in recorddata)
+
+    
+    options = tf.data.Options()
+    options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
+
+
+    retrieveddata = {
+        'X': tf.io.FixedLenSequenceFeature((), dtype=tf.float32, allow_missing=True), #float32
+        #'ecalsize': tf.io.FixedLenSequencFeature((), dtype=tf.int64, allow_missing=True), #needs size of ecal so it can reconstruct the narray
+        'Y': tf.io.FixedLenFeature((), dtype=tf.float32, default_value=0.0), #float32
+        'ang': tf.io.FixedLenFeature((), dtype=tf.float32, default_value=0.0),
+        'ecal': tf.io.FixedLenFeature((), dtype=tf.float32, default_value=0.0),
+    }
+
+    def _parse_function(example_proto):
+        # Parse the input `tf.Example` proto using the dictionary above.
+        data = tf.io.parse_single_example(example_proto, retrieveddata)
+        data['X'] = tf.reshape(data['X'],[1,51,51,25])
+        #print(tf.shape(data['Y']))
+        data['Y'] = tf.reshape(data['Y'],[1])
+        data['ang'] = tf.reshape(data['ang'],[1])
+        data['ecal'] = tf.reshape(data['ecal'],[1])
+        #print(tf.shape(data['Y']))
+        return data
+
+    parsed_dataset = recorddata.map(_parse_function).batch(batch_size, drop_remainder=True).repeat().with_options(options)
+
+    return parsed_dataset
+    #return parsed_dataset, ds_size
+
 
 #Compilation of models and definition of train/test files
 
@@ -476,34 +510,34 @@ else:
 if not use_gs:
     Trainfiles, Testfiles = DivideFiles(datapath, f, datasetnames=["ECAL"], Particles =[particle])
 if use_gs:
-    Trainfiles = ['gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_000.tfrecords',\
-                'gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_001.tfrecords',\
-                'gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_002.tfrecords',\
-                'gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_003.tfrecords',\
-                'gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_004.tfrecords',\
-                'gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_005.tfrecords',\
-                'gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_006.tfrecords',\
-                'gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_007.tfrecords',\
-                'gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_008.tfrecords',\
-                'gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_009.tfrecords',\
-                'gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_010.tfrecords',\
-                'gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_011.tfrecords',\
-                'gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_012.tfrecords',\
-                'gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_013.tfrecords',\
-                'gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_014.tfrecords',\
-                'gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_015.tfrecords',\
-                'gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_016.tfrecords',\
-                'gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_017.tfrecords',\
-                'gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_018.tfrecords',\
-                'gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_019.tfrecords',\
-                'gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_020.tfrecords',\
-                'gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_021.tfrecords',\
-                'gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_022.tfrecords',\
-                'gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_023.tfrecords',\
-                'gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_024.tfrecords']
-    Testfiles = ['gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_025.tfrecords',\
-                'gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_026.tfrecords',\
-                'gs://renato-tpu-bucket/Ele_VarAngleMeas_100_200_027.tfrecords']
+    Trainfiles = ['gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_000.tfrecords',\
+                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_001.tfrecords',\
+                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_002.tfrecords',\
+                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_003.tfrecords',\
+                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_004.tfrecords',\
+                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_005.tfrecords',\
+                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_006.tfrecords',\
+                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_007.tfrecords',\
+                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_008.tfrecords',\
+                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_009.tfrecords',\
+                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_010.tfrecords',\
+                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_011.tfrecords',\
+                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_012.tfrecords',\
+                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_013.tfrecords',\
+                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_014.tfrecords',\
+                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_015.tfrecords',\
+                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_016.tfrecords',\
+                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_017.tfrecords',\
+                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_018.tfrecords',\
+                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_019.tfrecords',\
+                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_020.tfrecords',\
+                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_021.tfrecords',\
+                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_022.tfrecords',\
+                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_023.tfrecords',\
+                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_024.tfrecords']
+    Testfiles = ['gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_025.tfrecords',\
+                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_026.tfrecords',\
+                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_027.tfrecords']
     
 
 print(Trainfiles)
@@ -639,7 +673,7 @@ def distributed_train_step(dataset):
     real_batch_loss_1, real_batch_loss_2, real_batch_loss_3, real_batch_loss_4, \
     fake_batch_loss_1, fake_batch_loss_2, fake_batch_loss_3, fake_batch_loss_4, \
     gen_batch_loss_1, gen_batch_loss_2, gen_batch_loss_3, gen_batch_loss_4, \
-    gen_batch_loss_5, gen_batch_loss_6, gen_batch_loss_7, gen_batch_loss_8  = strategy.run(Train_steps, args=(dataset,))
+    gen_batch_loss_5, gen_batch_loss_6, gen_batch_loss_7, gen_batch_loss_8  = strategy.run(Train_steps, args=(next(dataset),))
     
     real_batch_loss_1 = strategy.reduce(tf.distribute.ReduceOp.SUM, real_batch_loss_1, axis=None)
     real_batch_loss_2 = strategy.reduce(tf.distribute.ReduceOp.SUM, real_batch_loss_2, axis=None)
@@ -676,7 +710,7 @@ def distributed_train_step(dataset):
 @tf.function
 def distributed_test_step(dataset):
     disc_test_loss_1, disc_test_loss_2, disc_test_loss_3, disc_test_loss_4, \
-    gen_test_loss_1, gen_test_loss_2, gen_test_loss_3, gen_test_loss_4 = strategy.run(Test_steps, args=(dataset,))
+    gen_test_loss_1, gen_test_loss_2, gen_test_loss_3, gen_test_loss_4 = strategy.run(Test_steps, args=(next(dataset),))
 
     disc_test_loss_1 = strategy.reduce(tf.distribute.ReduceOp.SUM, disc_test_loss_1, axis=None)
     disc_test_loss_2 = strategy.reduce(tf.distribute.ReduceOp.SUM, disc_test_loss_2, axis=None)
@@ -700,21 +734,25 @@ with strategy.scope():
     optimizer_generator = RMSprop(lr)
   
     
-#with strategy.scope():
-#    latent = Input(shape=(latent_size, ), name='combined_z')   
-#    fake_image = generator( latent)
-#    discriminator.trainable = False
-#    fake, aux, ang, ecal = discriminator(fake_image) #remove add_loss
-#
-#    combined = Model(
-#        inputs=[latent],
-#        outputs=[fake, aux, ang, ecal], # remove add_loss
-#        name='combined_model'
-#   )
-#    
-#    combined.compile()
-#
-#    discriminator.trainable = True
+print ('Loading Data')
+
+dataset = RetrieveTFRecordpreprocessing(Trainfiles, batch_size)
+
+dist_dataset = strategy.experimental_distribute_dataset(dataset)
+
+dist_dataset_iter = iter(dist_dataset)
+
+test_dataset = RetrieveTFRecordpreprocessing(Testfiles, batch_size)
+
+test_dist_dataset = strategy.experimental_distribute_dataset(test_dataset)
+
+test_dist_dataset_iter = iter(test_dist_dataset)
+
+#needs to change so it is not hard coded
+#steps_per_epoch =int( datasetsize // (batch_size))
+steps_per_epoch =int( 124987 // (batch_size))
+#test_steps_per_epoch =int( datasetsizetest // (batch_size))
+test_steps_per_epoch =int( 12340 // (batch_size))
 
 # Start training
 for epoch in range(nb_epochs):
@@ -734,88 +772,63 @@ for epoch in range(nb_epochs):
     index = 0
     file_index=0
 
-    while nb_file < len(Trainfiles):
-        #if index % 100 == 0:
-        print('processed {} batches'.format(index + 1))
-        print ('Loading Data from .....', Trainfiles[nb_file])
+    print('Number of Batches: ', steps_per_epoch)
         
-        # Get the dataset from the trainfile
-        dataset = RetrieveTFRecord(Trainfiles[nb_file])
-
-        # Get the train values from the dataset
-        dataset = GetDataAngleParallel(dataset, xscale=xscale, xpower=xpower, angscale=angscale, angtype=angtype, thresh=thresh, daxis=daxis)
-        nb_file+=1
-
-        #create the dataset with tensors from the train values, and batch it using the global batch size
-        dataset = tf.data.Dataset.from_tensor_slices(dataset).batch(batch_size, drop_remainder=True)
+    for _ in range(steps_per_epoch):
+        file_time = time.time()
         
-        options = tf.data.Options()
-        options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
-        dataset = dataset.with_options(options)
+        #Discriminator Training
+        real_batch_loss, fake_batch_loss, gen_losses = distributed_train_step(dist_dataset_iter)
+
+        #Configure the loss so it is equal to the original values
+        real_batch_loss = [el.numpy() for el in real_batch_loss]
+        real_batch_loss_total_loss = np.sum(real_batch_loss)
+        new_real_batch_loss = [real_batch_loss_total_loss]
+        for i_weights in range(len(real_batch_loss)):
+            new_real_batch_loss.append(real_batch_loss[i_weights] / loss_weights[i_weights])
+        real_batch_loss = new_real_batch_loss
+
+        fake_batch_loss = [el.numpy() for el in fake_batch_loss]
+        fake_batch_loss_total_loss = np.sum(fake_batch_loss)
+        new_fake_batch_loss = [fake_batch_loss_total_loss]
+        for i_weights in range(len(fake_batch_loss)):
+            new_fake_batch_loss.append(fake_batch_loss[i_weights] / loss_weights[i_weights])
+        fake_batch_loss = new_fake_batch_loss
+
+        #if ecal sum has 100% loss(generating empty events) then end the training 
+        if fake_batch_loss[3] == 100.0 and index >10:
+            print("Empty image with Ecal loss equal to 100.0 for {} batch".format(index))
+            generator.save_weights(WeightsDir + '/{0}eee.hdf5'.format(g_weights), overwrite=True)
+            discriminator.save_weights(WeightsDir + '/{0}eee.hdf5'.format(d_weights), overwrite=True)
+            print ('real_batch_loss', real_batch_loss)
+            print ('fake_batch_loss', fake_batch_loss)
+            sys.exit()
+
+        # append mean of discriminator loss for real and fake events 
+        epoch_disc_loss.append([
+            (a + b) / 2 for a, b in zip(real_batch_loss, fake_batch_loss)
+        ])
 
 
-        #distribute the dataset
-        dist_dataset = strategy.experimental_distribute_dataset(dataset)
+        gen_losses[0] = [el.numpy() for el in gen_losses[0]]
+        gen_losses_total_loss = np.sum(gen_losses[0])
+        new_gen_losses = [gen_losses_total_loss]
+        for i_weights in range(len(gen_losses[0])):
+            new_gen_losses.append(gen_losses[0][i_weights] / loss_weights[i_weights])
+        gen_losses[0] = new_gen_losses
 
-        #Training
-        #add Trainfiles, nb_train_batches, progress_bar, daxis, daxis2, loss_ftn, combined
-        for batch in dist_dataset:
-            file_time = time.time()
-            this_batch_size =128 #not necessary can be removed
-            
+        gen_losses[1] = [el.numpy() for el in gen_losses[1]]
+        gen_losses_total_loss = np.sum(gen_losses[1])
+        new_gen_losses = [gen_losses_total_loss]
+        for i_weights in range(len(gen_losses[1])):
+            new_gen_losses.append(gen_losses[1][i_weights] / loss_weights[i_weights])
+        gen_losses[1] = new_gen_losses
 
-            #Discriminator Training
-            real_batch_loss, fake_batch_loss, gen_losses = distributed_train_step(batch)
+        generator_loss = [(a + b) / 2 for a, b in zip(*gen_losses)]
 
-            #Configure the loss so it is equal to the original values
-            real_batch_loss = [el.numpy() for el in real_batch_loss]
-            real_batch_loss_total_loss = np.sum(real_batch_loss)
-            new_real_batch_loss = [real_batch_loss_total_loss]
-            for i_weights in range(len(real_batch_loss)):
-                new_real_batch_loss.append(real_batch_loss[i_weights] / loss_weights[i_weights])
-            real_batch_loss = new_real_batch_loss
+        epoch_gen_loss.append(generator_loss)
 
-            fake_batch_loss = [el.numpy() for el in fake_batch_loss]
-            fake_batch_loss_total_loss = np.sum(fake_batch_loss)
-            new_fake_batch_loss = [fake_batch_loss_total_loss]
-            for i_weights in range(len(fake_batch_loss)):
-                new_fake_batch_loss.append(fake_batch_loss[i_weights] / loss_weights[i_weights])
-            fake_batch_loss = new_fake_batch_loss
-
-            #if ecal sum has 100% loss(generating empty events) then end the training 
-            if fake_batch_loss[3] == 100.0 and index >10:
-                print("Empty image with Ecal loss equal to 100.0 for {} batch".format(index))
-                generator.save_weights(WeightsDir + '/{0}eee.hdf5'.format(g_weights), overwrite=True)
-                discriminator.save_weights(WeightsDir + '/{0}eee.hdf5'.format(d_weights), overwrite=True)
-                print ('real_batch_loss', real_batch_loss)
-                print ('fake_batch_loss', fake_batch_loss)
-                sys.exit()
-
-            # append mean of discriminator loss for real and fake events 
-            epoch_disc_loss.append([
-                (a + b) / 2 for a, b in zip(real_batch_loss, fake_batch_loss)
-            ])
-
-
-            gen_losses[0] = [el.numpy() for el in gen_losses[0]]
-            gen_losses_total_loss = np.sum(gen_losses[0])
-            new_gen_losses = [gen_losses_total_loss]
-            for i_weights in range(len(gen_losses[0])):
-                new_gen_losses.append(gen_losses[0][i_weights] / loss_weights[i_weights])
-            gen_losses[0] = new_gen_losses
-
-            gen_losses[1] = [el.numpy() for el in gen_losses[1]]
-            gen_losses_total_loss = np.sum(gen_losses[1])
-            new_gen_losses = [gen_losses_total_loss]
-            for i_weights in range(len(gen_losses[1])):
-                new_gen_losses.append(gen_losses[1][i_weights] / loss_weights[i_weights])
-            gen_losses[1] = new_gen_losses
-
-            generator_loss = [(a + b) / 2 for a, b in zip(*gen_losses)]
-
-            epoch_gen_loss.append(generator_loss)
-
-            print('Time taken by batch was {} seconds.'.format(time.time()-file_time))
+        print('Time taken by batch was {} seconds.'.format(time.time()-file_time))
 
     print('Time taken by epoch{} was {} seconds.'.format(epoch, time.time()-epoch_start))
     train_time = time.time() - epoch_start
@@ -839,58 +852,35 @@ for epoch in range(nb_epochs):
     test_start = time.time()
 
 
-    # repeat till data is available
-    while nb_file < len(Testfiles):
 
-        print('processed {} batches'.format(index + 1))
-        print ('Loading Data from .....', Testfiles[nb_file])
-        
-        # Get the dataset from the Testfile
-        dataset = RetrieveTFRecord(Testfiles[nb_file])
-        #dataset = h5py.File(Testfiles[0],'r') #to read h5py
+    # Testing
+    #add Testfiles, nb_test_batches, daxis, daxis2, X_train(??), loss_ftn, combined
+    for _ in range(test_steps_per_epoch):
 
-        # Get the Test values from the dataset
-        dataset = GetDataAngleParallel(dataset, xscale=xscale, xpower=xpower, angscale=angscale, angtype=angtype, thresh=thresh, daxis=daxis)
-        nb_file+=1
+        this_batch_size = 128 #can be removed (should)
 
-        #create the dataset with tensors from the Test values, and batch it using the global batch size
-        #dataset = tf.data.Dataset.from_tensor_slices(dataset).batch(batch_size)
-        dataset = tf.data.Dataset.from_tensor_slices(dataset).batch(batch_size, drop_remainder=True)
+        disc_eval_loss, gen_eval_loss = distributed_test_step(test_dist_dataset_iter)
 
-        options = tf.data.Options()
-        options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
-        dataset = dataset.with_options(options)
+        #Configure the loss so it is equal to the original values
+        disc_eval_loss = [el.numpy() for el in disc_eval_loss]
+        disc_eval_loss_total_loss = np.sum(disc_eval_loss)
+        new_disc_eval_loss = [disc_eval_loss_total_loss]
+        for i_weights in range(len(disc_eval_loss)):
+            new_disc_eval_loss.append(disc_eval_loss[i_weights] / loss_weights[i_weights])
+        disc_eval_loss = new_disc_eval_loss
 
-        dist_dataset = strategy.experimental_distribute_dataset(dataset)
+        gen_eval_loss = [el.numpy() for el in gen_eval_loss]
+        gen_eval_loss_total_loss = np.sum(gen_eval_loss)
+        new_gen_eval_loss = [gen_eval_loss_total_loss]
+        for i_weights in range(len(gen_eval_loss)):
+            new_gen_eval_loss.append(gen_eval_loss[i_weights] / loss_weights[i_weights])
+        gen_eval_loss = new_gen_eval_loss
 
-        # Testing
-        #add Testfiles, nb_test_batches, daxis, daxis2, X_train(??), loss_ftn, combined
-        for batch in dist_dataset:
-
-            this_batch_size = 128 #can be removed (should)
-
-            disc_eval_loss, gen_eval_loss = distributed_test_step(batch)
-
-            #Configure the loss so it is equal to the original values
-            disc_eval_loss = [el.numpy() for el in disc_eval_loss]
-            disc_eval_loss_total_loss = np.sum(disc_eval_loss)
-            new_disc_eval_loss = [disc_eval_loss_total_loss]
-            for i_weights in range(len(disc_eval_loss)):
-                new_disc_eval_loss.append(disc_eval_loss[i_weights] / loss_weights[i_weights])
-            disc_eval_loss = new_disc_eval_loss
-
-            gen_eval_loss = [el.numpy() for el in gen_eval_loss]
-            gen_eval_loss_total_loss = np.sum(gen_eval_loss)
-            new_gen_eval_loss = [gen_eval_loss_total_loss]
-            for i_weights in range(len(gen_eval_loss)):
-                new_gen_eval_loss.append(gen_eval_loss[i_weights] / loss_weights[i_weights])
-            gen_eval_loss = new_gen_eval_loss
-
-            index +=1
-            # evaluate discriminator loss           
-            disc_test_loss.append(disc_eval_loss)
-            # evaluate generator loss
-            gen_test_loss.append(gen_eval_loss)
+        index +=1
+        # evaluate discriminator loss           
+        disc_test_loss.append(disc_eval_loss)
+        # evaluate generator loss
+        gen_test_loss.append(gen_eval_loss)
 
 
     #--------------------------------------------------------------------------------------------
