@@ -771,6 +771,7 @@ for epoch in range(nb_epochs):
     epoch_disc_loss = []
     index = 0
     file_index=0
+    nbatch = 0
 
     print('Number of Batches: ', steps_per_epoch)
         
@@ -828,7 +829,8 @@ for epoch in range(nb_epochs):
 
         epoch_gen_loss.append(generator_loss)
 
-        print('Time taken by batch was {} seconds.'.format(time.time()-file_time))
+        print('Time taken by batch', str(nbatch) ,' was', str(time.time()-file_time) , 'seconds.')
+        nbatch += 1
 
     print('Time taken by epoch{} was {} seconds.'.format(epoch, time.time()-epoch_start))
     train_time = time.time() - epoch_start
