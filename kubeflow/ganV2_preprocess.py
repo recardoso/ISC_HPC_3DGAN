@@ -31,6 +31,8 @@ from tensorflow.keras.models import Model, Sequential
 import math
 
 import json
+import boto3
+import datetime
 
 #Configs
 config = tf.compat.v1.ConfigProto(log_device_placement=True)
@@ -78,6 +80,7 @@ parser = get_parser()
 args = parser.parse_args()
 
 os.environ['S3_ENDPOINT'] = 'https://s3.cern.ch'
+client = boto3.client('s3', endpoint_url='https://s3.cern.ch')
 
 nb_epochs = args.nb_epochs #60 #Total Epochs
 is_full_training = args.is_full_training
@@ -477,7 +480,7 @@ def RetrieveTFRecordpreprocessing(recorddatapaths, batch_size):
         #print(tf.shape(data['Y']))
         return data
 
-    parsed_dataset = recorddata.map(_parse_function).batch(batch_size, drop_remainder=True).repeat().with_options(options)
+    parsed_dataset = recorddata.map(_parse_function, tf.data.experimental.AUTOTUNE).batch(batch_size, drop_remainder=True).repeat().with_options(options)
 
     return parsed_dataset
     #return parsed_dataset, ds_size
@@ -778,10 +781,17 @@ test_dist_dataset = strategy.experimental_distribute_dataset(test_dataset)
 test_dist_dataset_iter = iter(test_dist_dataset)
 
 #needs to change so it is not hard coded
-#steps_per_epoch =int( datasetsize // (batch_size))
-steps_per_epoch =int( 124987 // (batch_size))
-#test_steps_per_epoch =int( datasetsizetest // (batch_size))
-test_steps_per_epoch =int( 12340 // (batch_size))
+
+if is_full_training:
+    steps_per_epoch =int( 124987 // (batch_size))
+    test_steps_per_epoch =int( 12340 // (batch_size))
+    #steps_per_epoch =int( datasetsize // (batch_size))
+    #test_steps_per_epoch =int( datasetsizetest // (batch_size))
+else:
+    steps_per_epoch =int( 512 // (batch_size))
+    test_steps_per_epoch =int( 512 // (batch_size))
+
+epoch_metrics = {}
 
 # Start training
 for epoch in range(nb_epochs):
@@ -857,12 +867,14 @@ for epoch in range(nb_epochs):
         generator_loss = [(a + b) / 2 for a, b in zip(*gen_losses)]
 
         epoch_gen_loss.append(generator_loss)
-
-        print('Time taken by batch', str(nbatch) ,' was', str(time.time()-file_time) , 'seconds.')
+        batch_time = time.time()-file_time
+        print('Time taken by batch', str(nbatch) ,' was', str(batch_time) , 'seconds.')
+        epoch_metrics['time-batch-' + str(nbatch)] = batch_time
         nbatch += 1
 
     print('Time taken by epoch{} was {} seconds.'.format(epoch, time.time()-epoch_start))
     train_time = time.time() - epoch_start
+    epoch_metrics['train-epoch-time'] = train_time
 
     discriminator_train_loss = np.mean(np.array(epoch_disc_loss), axis=0)
     generator_train_loss = np.mean(np.array(epoch_gen_loss), axis=0)
@@ -952,7 +964,7 @@ for epoch in range(nb_epochs):
 
     epoch_time = time.time()-test_start
     print("The Testing for {} epoch took {} seconds. Weights are saved in {}".format(epoch, epoch_time, WeightsDir))
-
+    epoch_metrics['test-epoch-time'] = epoch_time
     
     # save loss dict to pkl file
     pickle.dump({'train': train_history, 'test': test_history}, open(pklfile, 'wb'))
@@ -961,10 +973,16 @@ for epoch in range(nb_epochs):
 
     metrics_names = ['loss', 'binary-loss', 'mean-loss-1', 'mae-loss', 'mean-loss-2']
 
-    with open('/model_outputs/metrics_custom.txt', 'w') as metrics_wf:
-        metrics_wf.write('train-epoch-time=' + str(train_time) + '\n')
-        metrics_wf.write('test-epoch-time=' + str(epoch_time) + '\n')
-        for i in range(len(metrics_names)):
-            for model_kind in ['generator', 'discriminator']:
-                metrics_wf.write(model_kind + '-train-' + metrics_names[i] + '=' + str(train_history[model_kind][-1][i]) + '\n')
-                metrics_wf.write(model_kind + '-test-' + metrics_names[i] + '=' + str(test_history[model_kind][-1][i]) + '\n')
+    for i in range(len(metrics_names)):
+        for model_kind in ['generator', 'discriminator']:
+            epoch_metrics[model_kind + '-train-' + metrics_names[i]] = train_history[model_kind][-1][i]
+            epoch_metrics[model_kind + '-test-' + metrics_names[i]] = test_history[model_kind][-1][i]
+
+    timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H:%M:%S')
+    filename = 'custom-metrics-epoch-' + str(epoch) + '-' + str(timestamp) + '.txt'
+    with open(filename, 'w') as f:
+        for key, value in epoch_metrics.items():
+            f.write(str(key) + '=' + str(value) + '\n')
+    os.system('cp ' + filename + ' /model_outputs/metrics_custom.txt')
+    client.upload_file(filename, 'dejan', filename)
+                
