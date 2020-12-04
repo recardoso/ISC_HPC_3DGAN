@@ -534,6 +534,39 @@ if use_eos:
     else:
         Trainfiles = ['/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_000.tfrecords']
         Testfiles = ['/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_001.tfrecords']
+else:
+    if is_full_training:
+        Trainfiles = ['gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_000.tfrecords',\
+                    'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_001.tfrecords',\
+                    'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_002.tfrecords',\
+                    'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_003.tfrecords',\
+                    'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_004.tfrecords',\
+                    'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_005.tfrecords',\
+                    'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_006.tfrecords',\
+                    'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_007.tfrecords',\
+                    'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_008.tfrecords',\
+                    'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_009.tfrecords',\
+                    'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_010.tfrecords',\
+                    'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_011.tfrecords',\
+                    'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_012.tfrecords',\
+                    'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_013.tfrecords',\
+                    'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_014.tfrecords',\
+                    'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_015.tfrecords',\
+                    'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_016.tfrecords',\
+                    'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_017.tfrecords',\
+                    'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_018.tfrecords',\
+                    'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_019.tfrecords',\
+                    'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_020.tfrecords',\
+                    'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_021.tfrecords',\
+                    'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_022.tfrecords',\
+                    'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_023.tfrecords',\
+                    'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_024.tfrecords']
+        Testfiles = ['gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_025.tfrecords',\
+                    'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_026.tfrecords',\
+                    'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_027.tfrecords']
+    else:
+        Trainfiles = ['gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_000.tfrecords']
+        Testfiles = ['gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_001.tfrecords']
 
 
 print(Trainfiles)
@@ -935,42 +968,3 @@ for epoch in range(nb_epochs):
             for model_kind in ['generator', 'discriminator']:
                 metrics_wf.write(model_kind + '-train-' + metrics_names[i] + '=' + str(train_history[model_kind][-1][i]) + '\n')
                 metrics_wf.write(model_kind + '-test-' + metrics_names[i] + '=' + str(test_history[model_kind][-1][i]) + '\n')
-
-    if use_eos:
-        os.system('cp /model_outputs/metrics_custom.txt /eos/user/d/dgolubov/tfresults/metrics_custom.txt')
-
-
-    # #--------------------------------------------------------------------------------------------
-    # #------------------------------ Analysis ----------------------------------------------------
-    # #--------------------------------------------------------------------------------------------
-
-    
-    # # if a short analysis is to be performed for each epoch
-    # if analyse:
-    #     print('analysing..........')
-    #     atime = time.time()
-    #     # load all test data
-    #     for index, dtest in enumerate(Testfiles):
-    #         if index == 0:
-    #             X_test, Y_test, ang_test, ecal_test = GetDataAngle(dtest, xscale=xscale, angscale=angscale, angtype=angtype, thresh=thresh, daxis=daxis)
-    #         else:
-    #             if X_test.shape[0] < nb_Test:
-    #                 X_temp, Y_temp, ang_temp,  ecal_temp = GetDataAngle(dtest, xscale=xscale, angscale=angscale, angtype=angtype, thresh=thresh, daxis=daxis)
-    #                 X_test = np.concatenate((X_test, X_temp))
-    #                 Y_test = np.concatenate((Y_test, Y_temp))
-    #                 ang_test = np.concatenate((ang_test, ang_temp))
-    #                 ecal_test = np.concatenate((ecal_test, ecal_temp))
-    #     if X_test.shape[0] > nb_Test:
-    #         X_test, Y_test, ang_test, ecal_test = X_test[:nb_Test], Y_test[:nb_Test], ang_test[:nb_Test], ecal_test[:nb_Test]
-    #     else:
-    #         nb_Test = X_test.shape[0] # the nb_test maybe different if total events are less than nEvents      
-    #     var=gan.sortEnergy([np.squeeze(X_test), Y_test, ang_test], ecal_test, energies, ang=1)
-    #     result = gan.OptAnalysisAngle(var, generator, energies, xpower = xpower, concat=2)
-    #     print('{} seconds taken by analysis'.format(time.time()-atime))
-    #     analysis_history['total'].append(result[0])
-    #     analysis_history['energy'].append(result[1])
-    #     analysis_history['moment'].append(result[2])
-    #     analysis_history['angle'].append(result[3])
-    #     print('Result = ', result)
-    #     # write analysis history to a pickel file
-    #     pickle.dump({'results': analysis_history}, open(resultfile, 'wb'))
