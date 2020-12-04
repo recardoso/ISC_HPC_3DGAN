@@ -1,0 +1,91 @@
+apiVersion: "kubeflow.org/v1alpha3"
+kind: Experiment
+metadata:
+  namespace: dejan-golubovic
+  name: gan3d-v2-preprocessed
+spec:
+  parallelTrialCount: 1
+  maxTrialCount: 1
+  maxFailedTrialCount: 1
+  objective:
+    type: minimize
+    goal: 0
+    objectiveMetricName: discriminator-train-binary-loss
+    additionalMetricNames:
+        - generator-train-binary-loss
+        - discriminator-train-loss
+        - generator-train-loss
+        - discriminator-test-loss
+        - generator-test-loss
+        - train-epoch-time
+        - test-epoch-time
+  algorithm:
+    algorithmName: random
+  metricsCollectorSpec:
+    source:
+      filter:
+        metricsFormat:
+        - ([\w|-]+)\s*=\s*((-?\d+)(\.\d+)?)
+      fileSystemPath:
+        path: "/model_outputs/metrics_custom.txt"
+        kind: File
+    collector:
+        kind: File
+  parameters:
+    - name: --nb_epochs
+      parameterType: int
+      feasibleSpace:
+        min: 1
+        max: 1
+    - name: --is_full_training
+      parameterType: int
+      feasibleSpace:
+        min: 1
+        max: 1
+    - name: --use-eos
+      parameterType: int
+      feasibleSpace:
+        min: 1
+        max: 1
+  trialTemplate:
+    goTemplate:
+      rawTemplate: |-
+        apiVersion: "kubeflow.org/v1"
+        kind: TFJob
+        metadata:
+          name: {{.Trial}}
+          namespace: {{.NameSpace}}
+        spec:
+         tfReplicaSpecs:
+          Worker:
+            replicas: 2
+            restartPolicy: OnFailure
+            template:
+              spec:
+                volumes:
+                  - hostPath:
+                      path: /var/eos
+                      type: ""
+                    name: eos
+                containers:
+                  - name: tensorflow
+                    ports:
+                    - containerPort: 2222
+                      name: tfjob-port
+                    resources:
+                      limits:
+                        nvidia.com/gpu: 1
+                    image: registry.hub.docker.com/dejangolubovic/gan3d:batch
+                    imagePullPolicy: Always
+                    volumeMounts:
+                      - mountPath: /eos
+                        mountPropagation: HostToContainer
+                        name: eos
+                    command:
+                      - "python3"
+                      - "/opt/ganV2_preprocess.py"
+                      {{- with .HyperParameters}}
+                      {{- range .}}
+                      - "{{.Name}}={{.Value}}"
+                      {{- end}}
+                      {{- end}}
