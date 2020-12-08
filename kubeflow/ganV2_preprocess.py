@@ -39,9 +39,6 @@ config = tf.compat.v1.ConfigProto(log_device_placement=True)
 config.gpu_options.allow_growth = True
 main_session = tf.compat.v1.InteractiveSession(config=config)
 
-GLOBAL_BATCH_SIZE = 64
-nb_epochs = 60 #60 #Total Epochs
-batch_size = 64 #batch size
 latent_size = 256 #latent vector size
 verbose = True
 
@@ -73,6 +70,7 @@ def get_parser():
     parser.add_argument('--nb_epochs', type=int, default=1, help='Number of epochs')
     parser.add_argument('--is_full_training', type=int, default=0, help='Load one file, or all files')
     parser.add_argument('--use-eos', type=int, default=0, help='Use EOS or s3 bucket to load files')
+    parser.add_argument('--batch-size', type=int, default=64, help='Batch size')
 
     return parser
 
@@ -85,6 +83,7 @@ client = boto3.client('s3', endpoint_url='https://s3.cern.ch')
 nb_epochs = args.nb_epochs #60 #Total Epochs
 is_full_training = args.is_full_training
 use_eos = args.use_eos
+batch_size = args.batch_size
 
 if use_eos:
     datapath = '/eos/user/r/redacost/tfrecordsprepro/*.tfrecords'# Data path
