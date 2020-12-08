@@ -16,6 +16,7 @@ import numpy as np
 import time
 import math
 import tensorflow as tf
+import uuid
 
 import tensorflow.keras.backend as K
 from tensorflow.keras.layers import Input
@@ -62,6 +63,8 @@ name = 'gan_training'
 g_weights='params_generator_epoch_'
 d_weights='params_discriminator_epoch_'
 
+job_id = uuid.uuid4()
+
 tlab = False
 
 def get_parser():
@@ -69,8 +72,9 @@ def get_parser():
 
     parser.add_argument('--nb_epochs', type=int, default=1, help='Number of epochs')
     parser.add_argument('--is_full_training', type=int, default=0, help='Load one file, or all files')
-    parser.add_argument('--use-eos', type=int, default=0, help='Use EOS or s3 bucket to load files')
-    parser.add_argument('--batch-size', type=int, default=64, help='Batch size')
+    parser.add_argument('--use_eos', type=int, default=0, help='Use EOS or s3 bucket to load files')
+    parser.add_argument('--batch_size', type=int, default=64, help='Batch size')
+    parser.add_argument('--use_autotune', type=int, default=0, help='Use autotune option for dataset processing')
 
     return parser
 
@@ -84,6 +88,7 @@ nb_epochs = args.nb_epochs #60 #Total Epochs
 is_full_training = args.is_full_training
 use_eos = args.use_eos
 batch_size = args.batch_size
+use_autotune = args.use_autotune
 
 outpath = './'# training output
 
@@ -473,7 +478,10 @@ def RetrieveTFRecordpreprocessing(recorddatapaths, batch_size):
         #print(tf.shape(data['Y']))
         return data
 
-    parsed_dataset = recorddata.map(_parse_function, tf.data.experimental.AUTOTUNE).batch(batch_size, drop_remainder=True).repeat().with_options(options)
+    if use_autotune:
+        parsed_dataset = recorddata.map(_parse_function, tf.data.experimental.AUTOTUNE).batch(batch_size, drop_remainder=True).repeat().with_options(options)
+    else:
+        parsed_dataset = recorddata.map(_parse_function).batch(batch_size, drop_remainder=True).repeat().with_options(options)
 
     return parsed_dataset
     #return parsed_dataset, ds_size
@@ -499,37 +507,39 @@ else:
 #Trainfiles, Testfiles = DivideFiles(datapath, f, datasetnames=["ECAL"], Particles =[particle])
 if use_eos:
     if is_full_training:
-        Trainfiles = ['/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_000.tfrecords',\
-                    '/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_001.tfrecords',\
-                    '/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_002.tfrecords',\
-                    '/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_003.tfrecords',\
-                    '/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_004.tfrecords',\
-                    '/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_005.tfrecords',\
-                    '/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_006.tfrecords',\
-                    '/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_007.tfrecords',\
-                    '/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_008.tfrecords',\
-                    '/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_009.tfrecords',\
-                    '/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_010.tfrecords',\
-                    '/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_011.tfrecords',\
-                    '/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_012.tfrecords',\
-                    '/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_013.tfrecords',\
-                    '/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_014.tfrecords',\
-                    '/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_015.tfrecords',\
-                    '/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_016.tfrecords',\
-                    '/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_017.tfrecords',\
-                    '/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_018.tfrecords',\
-                    '/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_019.tfrecords',\
-                    '/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_020.tfrecords',\
-                    '/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_021.tfrecords',\
-                    '/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_022.tfrecords',\
-                    '/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_023.tfrecords',\
-                    '/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_024.tfrecords']
-        Testfiles = ['/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_025.tfrecords',\
-                    '/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_026.tfrecords',\
-                    '/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_027.tfrecords']
+        Trainfiles = [
+                    '/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_000.tfrecords',\
+                    '/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_001.tfrecords',\
+                    '/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_002.tfrecords',\
+                    '/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_003.tfrecords',\
+                    '/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_004.tfrecords',\
+                    '/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_005.tfrecords',\
+                    '/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_006.tfrecords',\
+                    '/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_007.tfrecords',\
+                    '/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_008.tfrecords',\
+                    '/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_009.tfrecords',\
+                    '/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_010.tfrecords',\
+                    '/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_011.tfrecords',\
+                    '/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_012.tfrecords',\
+                    '/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_013.tfrecords',\
+                    '/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_014.tfrecords',\
+                    '/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_015.tfrecords',\
+                    '/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_016.tfrecords',\
+                    '/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_017.tfrecords',\
+                    '/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_018.tfrecords',\
+                    '/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_019.tfrecords',\
+                    '/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_020.tfrecords',\
+                    '/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_021.tfrecords',\
+                    '/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_022.tfrecords',\
+                    '/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_023.tfrecords',\
+                    '/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_024.tfrecords']
+        Testfiles = [
+                    '/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_025.tfrecords',\
+                    '/eos/user/d/dgolubovtfrecordsprepro/Ele_VarAngleMeas_100_200_026.tfrecords',\
+                    '/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_027.tfrecords']
     else:
-        Trainfiles = ['/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_000.tfrecords']
-        Testfiles = ['/eos/user/r/redacost/tfrecordsprepro/Ele_VarAngleMeas_100_200_001.tfrecords']
+        Trainfiles = ['/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_000.tfrecords']
+        Testfiles = ['/eos/user/d/dgolubov/tfrecordsprepro/Ele_VarAngleMeas_100_200_001.tfrecords']
 else:
     if is_full_training:
         Trainfiles = ['gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_000.tfrecords',\
@@ -972,7 +982,7 @@ for epoch in range(nb_epochs):
             epoch_metrics[model_kind + '-test-' + metrics_names[i]] = test_history[model_kind][-1][i]
 
     timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H:%M:%S')
-    filename = 'custom-metrics-epoch-' + str(epoch) + '-' + str(timestamp) + '.txt'
+    filename = 'job-id-' + str(job_id) + '-epoch-' + str(epoch) + '-' + str(timestamp) + '.txt'
     with open(filename, 'w') as f:
         for key, value in epoch_metrics.items():
             f.write(str(key) + '=' + str(value) + '\n')
