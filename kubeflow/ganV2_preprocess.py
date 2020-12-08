@@ -85,15 +85,9 @@ is_full_training = args.is_full_training
 use_eos = args.use_eos
 batch_size = args.batch_size
 
-if use_eos:
-    datapath = '/eos/user/r/redacost/tfrecordsprepro/*.tfrecords'# Data path
-    outpath = '/eos/user/d/dgolubov/tfresults/'# training output
-else:
-    datapath = 's3://swift/v1/gan-bucket/tfrecords/'# Data path
-    outpath = './'# training output
+outpath = './'# training output
 
 # ## Models
-
 
 # calculate sum of intensities
 def ecal_sum(image, daxis):
