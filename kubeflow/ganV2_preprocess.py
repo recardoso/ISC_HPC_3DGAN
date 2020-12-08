@@ -84,6 +84,11 @@ args = parser.parse_args()
 os.environ['S3_ENDPOINT'] = 'https://s3.cern.ch'
 client = boto3.client('s3', endpoint_url='https://s3.cern.ch')
 
+tf_config_str = os.environ.get('TF_CONFIG')
+print(tf_config_str)
+tf_config_dict  = json.loads(tf_config_str)
+print(tf_config_dict)
+
 nb_epochs = args.nb_epochs #60 #Total Epochs
 is_full_training = args.is_full_training
 use_eos = args.use_eos
@@ -981,11 +986,12 @@ for epoch in range(nb_epochs):
             epoch_metrics[model_kind + '-train-' + metrics_names[i]] = train_history[model_kind][-1][i]
             epoch_metrics[model_kind + '-test-' + metrics_names[i]] = test_history[model_kind][-1][i]
 
-    timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H:%M:%S')
-    filename = 'job-id-' + str(job_id) + '-epoch-' + str(epoch) + '-' + str(timestamp) + '.txt'
-    with open(filename, 'w') as f:
-        for key, value in epoch_metrics.items():
-            f.write(str(key) + '=' + str(value) + '\n')
-    os.system('cp ' + filename + ' /model_outputs/metrics_custom.txt')
-    client.upload_file(filename, 'dejan', filename)
+    if tf_config_dict['task']['index'] == 0:
+        timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H:%M:%S')
+        filename = 'tfjob-id-' + str(job_id) + '-epoch-' + str(epoch) + '-' + str(timestamp) + '.txt'
+        with open(filename, 'w') as f:
+            for key, value in epoch_metrics.items():
+                f.write(str(key) + '=' + str(value) + '\n')
+        os.system('cp ' + filename + ' /model_outputs/metrics_custom.txt')
+        client.upload_file(filename, 'dejan', filename)
                 
