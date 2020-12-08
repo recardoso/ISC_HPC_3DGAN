@@ -47,6 +47,11 @@ spec:
       feasibleSpace:
         min: 0
         max: 0
+    - name: --batch-size
+      parameterType: int
+      feasibleSpace:
+        min: 64
+        max: 64
   trialTemplate:
     goTemplate:
       rawTemplate: |-
