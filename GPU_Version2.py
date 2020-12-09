@@ -73,6 +73,8 @@ def get_parser():
     parser.add_argument('--use_gs', action='store', default=False)
     parser.add_argument('--datapath', action='store', default='')
     parser.add_argument('--outpath', action='store', default='')
+    parser.add_argument('--nbepochs', action='store', type=int, default='', help='Number of epochs to train for.')
+    parser.add_argument('--batchsize', action='store', type=int, default='', help='batch size per update')
     return parser
 
 parser = get_parser()
@@ -85,6 +87,10 @@ if not params.datapath == '':
     datapath = params.datapath
 if not params.outpath == '':
     outpath = params.outpath
+if not params.nbepochs == '':
+    nb_epochs = params.nbepochs
+if not params.batchsize == '':
+    batch_size = params.batchsize
 
 if multi_node:
     workers = params.workers
