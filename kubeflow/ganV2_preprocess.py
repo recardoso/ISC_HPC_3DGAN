@@ -455,7 +455,7 @@ def RetrieveTFRecord(recorddatapaths):
     return dataset
 
 def RetrieveTFRecordpreprocessing(recorddatapaths, batch_size):
-    recorddata = tf.data.TFRecordDataset(recorddatapaths)
+    recorddata = tf.data.TFRecordDataset(recorddatapaths, num_parallel_reads=tf.data.experimental.AUTOTUNE)
 
     #ds_size = sum(1 for _ in recorddata)
 
@@ -483,10 +483,11 @@ def RetrieveTFRecordpreprocessing(recorddatapaths, batch_size):
         #print(tf.shape(data['Y']))
         return data
 
+    print('Prefetching')
     if use_autotune:
-        parsed_dataset = recorddata.map(_parse_function, tf.data.experimental.AUTOTUNE).batch(batch_size, drop_remainder=True).repeat().with_options(options)
+        parsed_dataset = recorddata.map(_parse_function, num_parallel_calls=tf.data.experimental.AUTOTUNE).prefetch(buffer_size=tf.data.experimental.AUTOTUNE).batch(batch_size, drop_remainder=True).repeat().with_options(options)
     else:
-        parsed_dataset = recorddata.map(_parse_function).batch(batch_size, drop_remainder=True).repeat().with_options(options)
+        parsed_dataset = recorddata.map(_parse_function).batch(batch_size, drop_remainder=True).prefetch(buffer_size=tf.data.experimental.AUTOTUNE).repeat().with_options(options)
 
     return parsed_dataset
     #return parsed_dataset, ds_size
@@ -986,9 +987,14 @@ for epoch in range(nb_epochs):
             epoch_metrics[model_kind + '-train-' + metrics_names[i]] = train_history[model_kind][-1][i]
             epoch_metrics[model_kind + '-test-' + metrics_names[i]] = test_history[model_kind][-1][i]
 
+    epoch_metrics['batch-size'] = batch_size
+    epoch_metrics['batch-size-per-replica'] = batch_size_per_replica
+    epoch_metrics['num_replicas_in_sync'] = strategy.num_replicas_in_sync
+    epoch_metrics['n_workers'] = len(tf_config_dict['cluster']['worker'])
+
     if tf_config_dict['task']['index'] == 0:
         timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H:%M:%S')
-        filename = 'tfjob-id-' + str(job_id) + '-epoch-' + str(epoch) + '-' + str(timestamp) + '.txt'
+        filename = 'tfjob-id-' + str(job_id) + '-epoch-' + str(epoch) + '-batchsize-' + str(batch_size) + '-' + str(timestamp) + '.txt'
         with open(filename, 'w') as f:
             for key, value in epoch_metrics.items():
                 f.write(str(key) + '=' + str(value) + '\n')
