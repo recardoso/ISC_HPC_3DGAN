@@ -2,7 +2,7 @@ apiVersion: "kubeflow.org/v1alpha3"
 kind: Experiment
 metadata:
   namespace: kubeflow
-  name: gan3d-tpu
+  name: gan3d-tpu-8-v15
 spec:
   parallelTrialCount: 1
   maxTrialCount: 1
@@ -68,15 +68,13 @@ spec:
         spec:
          tfReplicaSpecs:
           Worker:
-            replicas: 2
+            replicas: 1
             restartPolicy: OnFailure
             template:
+              metadata:
+                annotations:
+                  tf-version.cloud-tpus.google.com: "2.3"
               spec:
-                volumes:
-                  - hostPath:
-                      path: /var/eos
-                      type: ""
-                    name: eos
                 containers:
                   - name: tensorflow
                     ports:
@@ -84,13 +82,9 @@ spec:
                       name: tfjob-port
                     resources:
                       limits:
-                        cloud-tpus.google.com/v2: "8"
+                        cloud-tpus.google.com/preemptible-v2: 8
                     image: registry.hub.docker.com/dejangolubovic/gan3d:batch
                     imagePullPolicy: Always
-                    volumeMounts:
-                      - mountPath: /eos
-                        mountPropagation: HostToContainer
-                        name: eos
                     command:
                       - "python3"
                       - "/opt/ganV2_TPU.py"
