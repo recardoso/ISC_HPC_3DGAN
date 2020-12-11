@@ -1,10 +1,13 @@
 ARG IMAGE_TYPE="gpu"
 FROM docker.io/dejangolubovic/gan3d
+RUN pip3 install boto3 --user
 
 COPY gan.py /
 ADD gan.py /opt/gan.py
 COPY mnist-dist.py /opt/mnist-dist.py
 COPY ganV2.py /opt/ganV2.py
+COPY ganV2_preprocess.py /opt/ganV2_preprocess.py
+COPY ganV2_TPU.py /opt/ganV2_TPU.py
 
 COPY krb5cc_1000 /tmp/krb5cc_1000
 COPY krb5cc_1000 /tmp/krb5cc_0
@@ -17,4 +20,9 @@ chmod +x /opt/gan.py && \
 mkdir /model_outputs && \
 chmod -R 777 /model_outputs && \
 chmod +x /opt/mnist-dist.py && \
-chmod +x /opt/ganV2.py
+chmod +x /opt/ganV2.py && \
+chmod +x /opt/ganV2_preprocess.py && \
+chmod +x /opt/ganV2_TPU.py && \
+mkdir /home/jovyan/.aws
+
+COPY credentials /home/jovyan/.aws/credentials
