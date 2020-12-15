@@ -851,6 +851,7 @@ for epoch in range(nb_epochs):
             discriminator.save_weights(WeightsDir + '/{0}eee.hdf5'.format(d_weights), overwrite=True)
             print ('real_batch_loss', real_batch_loss)
             print ('fake_batch_loss', fake_batch_loss)
+            print ('Ending because of an error, if ecal sum has 100 perceny loss(generating empty events) then end the training ')
             sys.exit()
 
         # append mean of discriminator loss for real and fake events 
@@ -965,11 +966,15 @@ for epoch in range(nb_epochs):
     print(ROW_FMT.format('discriminator (test)',
                             *test_history['discriminator'][-1]))
 
-    # save weights every epoch                                                                                                                                                                                                                                                    
-    generator.save_weights(WeightsDir + '/{0}{1:03d}.hdf5'.format(g_weights, epoch),
-                            overwrite=True)
-    discriminator.save_weights(WeightsDir + '/{0}{1:03d}.hdf5'.format(d_weights, epoch),
-                                overwrite=True)
+    # save weights every epoch
+    generator_weights_path = WeightsDir + '/{0}{1:03d}.hdf5'.format(g_weights, epoch)
+    discriminator_weights_path = WeightsDir + '/{0}{1:03d}.hdf5'.format(g_weights, epoch)
+
+    print('generator_weights_path', generator_weights_path)
+    print('discriminator_weights_path', discriminator_weights_path)
+
+    generator.save_weights(generator_weights_path, overwrite=True)
+    discriminator.save_weights(discriminator_weights_path, overwrite=True)
 
     epoch_time = time.time()-test_start
     print("The Testing for {} epoch took {} seconds. Weights are saved in {}".format(epoch, epoch_time, WeightsDir))
@@ -999,5 +1004,9 @@ for epoch in range(nb_epochs):
             for key, value in epoch_metrics.items():
                 f.write(str(key) + '=' + str(value) + '\n')
         os.system('cp ' + filename + ' /model_outputs/metrics_custom.txt')
+        
         client.upload_file(filename, 'dejan', filename)
+
+        client.upload_file(generator_weights_path, 'dejan', filename[:-4] + '_params_generator.hdf5')
+        client.upload_file(discriminator_weights_path, 'dejan', filename[:-4] + '_params_discriminator.hdf5')
                 
