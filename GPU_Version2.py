@@ -461,7 +461,7 @@ def RetrieveTFRecord(recorddatapaths):
     return dataset
 
 def RetrieveTFRecordpreprocessing(recorddatapaths, batch_size):
-    recorddata = tf.data.TFRecordDataset(recorddatapaths)
+    recorddata = tf.data.TFRecordDataset(recorddatapaths, num_parallel_reads=tf.data.experimental.AUTOTUNE )
 
     #ds_size = sum(1 for _ in recorddata)
 
@@ -489,7 +489,7 @@ def RetrieveTFRecordpreprocessing(recorddatapaths, batch_size):
         #print(tf.shape(data['Y']))
         return data
 
-    parsed_dataset = recorddata.map(_parse_function).batch(batch_size, drop_remainder=True).repeat().with_options(options)
+    parsed_dataset = recorddata.map(_parse_function,num_parallel_calls=tf.data.experimental.AUTOTUNE).cache().shuffle(124987).repeat().batch(batch_size, drop_remainder=True).with_options(options)
 
     return parsed_dataset
     #return parsed_dataset, ds_size
@@ -785,7 +785,10 @@ for epoch in range(nb_epochs):
         file_time = time.time()
         
         #Discriminator Training
+        tf.profiler.experimental.start('logdir')
         real_batch_loss, fake_batch_loss, gen_losses = distributed_train_step(dist_dataset_iter)
+        tf.profiler.experimental.stop()
+
 
         #Configure the loss so it is equal to the original values
         real_batch_loss = [el.numpy() for el in real_batch_loss]
