@@ -75,6 +75,7 @@ def get_parser():
     parser.add_argument('--outpath', action='store', default='')
     parser.add_argument('--nbepochs', action='store', type=int, default=60, help='Number of epochs to train for.')
     parser.add_argument('--batchsize', action='store', type=int, default=64, help='batch size per update')
+    parser.add_argument('--do_profiling', action='store', default=False)
     return parser
 
 parser = get_parser()
@@ -82,6 +83,7 @@ params = parser.parse_args()
 
 multi_node = params.multi_node
 use_gs = params.use_gs
+de_profiling = params.do_profiling
 
 if not params.datapath == '':
     datapath = params.datapath
@@ -588,7 +590,7 @@ def Train_steps(dataset):
     
     #------------Minimize------------
     #aggregate_grads_outside_optimizer = (optimizer._HAS_AGGREGATE_GRAD and not isinstance(strategy.extended, parameter_server_strategy.))
-    gradients = optimizer_discriminator._clip_gradients(gradients)
+    #gradients = optimizer_discriminator._clip_gradients(gradients)
 
     #--------------------------------
     
@@ -603,7 +605,7 @@ def Train_steps(dataset):
         predictions = discriminator(generated_images, training=True)
         fake_batch_loss = compute_global_loss(labels, predictions, batch_size, loss_weights=loss_weights)
     gradients = tape.gradient(fake_batch_loss, discriminator.trainable_variables) # model.trainable_variables or  model.trainable_weights
-    gradients = optimizer_discriminator._clip_gradients(gradients)
+    #gradients = optimizer_discriminator._clip_gradients(gradients)
     optimizer_discriminator.apply_gradients(zip(gradients, discriminator.trainable_variables)) # model.trainable_variables or  model.trainable_weights
 
 
@@ -624,7 +626,7 @@ def Train_steps(dataset):
             loss = compute_global_loss(labels, predictions, batch_size, loss_weights=loss_weights)
 
         gradients = tape.gradient(loss, generator.trainable_variables) # model.trainable_variables or  model.trainable_weights
-        gradients = optimizer_generator._clip_gradients(gradients)
+        #gradients = optimizer_generator._clip_gradients(gradients)
         optimizer_generator.apply_gradients(zip(gradients, generator.trainable_variables)) # model.trainable_variables or  model.trainable_weights
 
         for el in loss:
@@ -785,9 +787,18 @@ for epoch in range(nb_epochs):
         file_time = time.time()
         
         #Discriminator Training
-        tf.profiler.experimental.start('logdir')
-        real_batch_loss, fake_batch_loss, gen_losses = distributed_train_step(dist_dataset_iter)
-        tf.profiler.experimental.stop()
+        if do_profiling:
+            tf.profiler.experimental.start('logdir')
+
+            #if nbatch == 2:
+            #    options = tf.profiler.experimental.ProfilerOptions(delay_ms=1000)
+            #    tf.profiler.experimental.client.trace('grpc://10.164.0.9:12345,grpc://10.164.0.10:12345','gs://renato_bucket/profiles',4000,options=options)
+        
+
+            real_batch_loss, fake_batch_loss, gen_losses = distributed_train_step(dist_dataset_iter)
+            tf.profiler.experimental.stop()
+        else:
+            real_batch_loss, fake_batch_loss, gen_losses = distributed_train_step(dist_dataset_iter)
 
 
         #Configure the loss so it is equal to the original values
