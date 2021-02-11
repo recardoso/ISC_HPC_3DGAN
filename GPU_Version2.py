@@ -83,7 +83,7 @@ params = parser.parse_args()
 
 multi_node = params.multi_node
 use_gs = params.use_gs
-de_profiling = params.do_profiling
+do_profiling = params.do_profiling
 
 if not params.datapath == '':
     datapath = params.datapath
