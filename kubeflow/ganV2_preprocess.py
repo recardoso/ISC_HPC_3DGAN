@@ -34,6 +34,7 @@ import math
 import json
 import boto3
 import datetime
+import tarfile
 
 #Configs
 config = tf.compat.v1.ConfigProto(log_device_placement=True)
@@ -75,6 +76,7 @@ def get_parser():
     parser.add_argument('--use_eos', type=int, default=0, help='Use EOS or s3 bucket to load files')
     parser.add_argument('--batch_size', type=int, default=64, help='Batch size')
     parser.add_argument('--use_autotune', type=int, default=0, help='Use autotune option for dataset processing')
+    parser.add_argument('--do_profiling', type=int, default=0, help='Do profiling or not')
 
     return parser
 
@@ -85,15 +87,15 @@ os.environ['S3_ENDPOINT'] = 'https://s3.cern.ch'
 client = boto3.client('s3', endpoint_url='https://s3.cern.ch')
 
 tf_config_str = os.environ.get('TF_CONFIG')
-print(tf_config_str)
 tf_config_dict  = json.loads(tf_config_str)
-print(tf_config_dict)
 
 nb_epochs = args.nb_epochs #60 #Total Epochs
 is_full_training = args.is_full_training
 use_eos = args.use_eos
 batch_size = args.batch_size
 use_autotune = args.use_autotune
+do_profiling = args.do_profiling
+profiling_dir = 'logdir'
 
 outpath = './'# training output
 
@@ -316,6 +318,9 @@ if not os.path.exists(outpath + 'results/3dgan_history_gan_training/'):
 
 if not os.path.exists(outpath + 'results/3dgan_analysis_gan_training/'):
     os.makedirs(outpath + 'results/3dgan_analysis_gan_training/')
+
+if not os.path.exists(outpath + profiling_dir):
+    os.makedirs(outpath + profiling_dir)
 
 WeightsDir = outpath + 'weights/3dgan_weights_' + name
 pklfile = outpath + 'results/3dgan_history_' + name + '.pkl'# loss history
@@ -827,8 +832,17 @@ for epoch in range(nb_epochs):
         file_time = time.time()
         
         #Discriminator Training
-        real_batch_loss, fake_batch_loss, gen_losses = distributed_train_step(dist_dataset_iter)
+        if do_profiling:
+            tf.profiler.experimental.start('logdir')
+            real_batch_loss, fake_batch_loss, gen_losses = distributed_train_step(dist_dataset_iter)
+            tf.profiler.experimental.stop()
 
+            if nbatch > 5:
+                print('Profiling stops')
+                break
+        else:
+            real_batch_loss, fake_batch_loss, gen_losses = distributed_train_step(dist_dataset_iter)
+            
         #Configure the loss so it is equal to the original values
         real_batch_loss = [el.numpy() for el in real_batch_loss]
         real_batch_loss_total_loss = np.sum(real_batch_loss)
@@ -1006,7 +1020,10 @@ for epoch in range(nb_epochs):
         os.system('cp ' + filename + ' /model_outputs/metrics_custom.txt')
         
         client.upload_file(filename, 'dejan', filename)
-
         client.upload_file(generator_weights_path, 'dejan', filename[:-4] + '_params_generator.hdf5')
         client.upload_file(discriminator_weights_path, 'dejan', filename[:-4] + '_params_discriminator.hdf5')
-                
+
+    if do_profiling:
+        profiling_filename = 'tfjob-id-' + str(job_id) + '-epoch-' + str(epoch) + '-batchsize-' + str(batch_size) + '-taskindex-' + str(tf_config_dict['task']['index']) + '-' + str(timestamp) + '.tar.gz'
+        with tarfile.open(profiling_filename, "w:gz") as tar:
+            tar.add(outpath + profiling_dir, arcname=os.path.basename(outpath + profiling_dir))
