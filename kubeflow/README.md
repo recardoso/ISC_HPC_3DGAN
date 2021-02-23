@@ -13,7 +13,8 @@ Steps to run:
     - --is_full_training - do we run full dataset or just a 512 examples. Set it to 0 when want to just test things, otherwise 1
     - --use_eos - read data from eos, use on local Kubeflow instance. On GCP, use 1
     - --batch_size - batch size
-    - --use-autotune - always leave to 1
+    - --use_autotune - always leave to 1
+    - --do_profling - do tensorflow profiling or not
 - At kubeflow/katib/#/katib/hp, click Deploy
 - After each epoch, results are stored in the bucket s3://dejan 
     - Sending you s3cmd config file on Mattermoost
