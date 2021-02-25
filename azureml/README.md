@@ -8,7 +8,7 @@ The times do not include testing times, only training times.
 
 Using Standard_NC24rs_v3 (InfiniBand, 4 x NVIDIA V100, 24 vCPU, 448 mem.):
 
-Run | Nodes | Total GPUs | Total Epochs | AUTOTUNE | Logs | Epoch 1 | Epoch 2 | Epoch 3 | Epoch 4 | Epoch 5 |
+| Run | Nodes | Total GPUs | Total Epochs | AUTOTUNE | Logs | Epoch 1 | Epoch 2 | Epoch 3 | Epoch 4 | Epoch 5 |
 | ------- | ------- | ------- | ------- | ------ | ------------------------------------------------ | ------- | ------- | ------- | ------- | ------ | ------ | ------ | ----- | ----- | ----- | ----- |
 | 1       | 2       | 8       |         | No     | [Logs](https://s3.cern.ch/swift/v1/mlogs/run24)  | 568.91  | 496.91  | 496.83  |         |        |        |        |       |       |       |       |
 | 2       | 4       | 16      |         | No     | [Logs](https://s3.cern.ch/swift/v1/mlogs/run27)  | 322.49  | 248.47  | 248.54  |         |        |        |        |       |       |       |       |
