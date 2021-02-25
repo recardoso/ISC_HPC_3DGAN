@@ -1,26 +1,26 @@
-# 3DGAN Results Microsoft Azure
+# 3DGAN Results Microsoft Azure 
 
-These runs were performed using Azure's [Machine Learning service](https://azure.microsoft.com/en-us/services/machine-learning/).
+These runs were performed using Azure's [Machine Learning service](https://azure.microsoft.com/en-us/services/machine-learning/). 
 
 #### Batch Size 64 with InfiniBand
 
-The times do not include testing times, only training times.
+The times do not include testing times, only training times. 
 
 Using Standard_NC24rs_v3 (InfiniBand, 4 x NVIDIA V100, 24 vCPU, 448 mem.):
 
-| Run | Nodes | Total GPUs | Total Epochs | AUTOTUNE | Logs | Epoch 1 | Epoch 2 | Epoch 3 | Epoch 4 | Epoch 5 |
-| ------- | ------- | ------- | ------- | ------ | ------------------------------------------------ | ------- | ------- | ------- | ------- | ------ | ------ | ------ | ----- | ----- | ----- | ----- |
-| 1       | 2       | 8       |         | No     | [Logs](https://s3.cern.ch/swift/v1/mlogs/run24)  | 568.91  | 496.91  | 496.83  |         |        |        |        |       |       |       |       |
-| 2       | 4       | 16      |         | No     | [Logs](https://s3.cern.ch/swift/v1/mlogs/run27)  | 322.49  | 248.47  | 248.54  |         |        |        |        |       |       |       |       |
-| 3       | 8       | 32      |         | No     | [Logs](https://s3.cern.ch/swift/v1/mlogs/run28)  | 200.84  | 126.81  | 126.21  |         |        |        |        |       |       |       |       |
-| 4       | 8       | 32      |         | No     | [Logs](https://s3.cern.ch/swift/v1/mlogs/run42)  | 214.19  | 138.51  | 141.33  | 138.16  | 138.04 |        |        |       |       |       |       |
-| 5       | 8       | 32      |         | No     | [Logs](https://s3.cern.ch/swift/v1/mlogs/run43)  | 201.20  | 125.12  | 126.29  | 127.03  | 127.21 | 128.30 | 128.64 |       |       |       |       |
-| 6       | 8       | 32      |         | No     | [Logs](https://s3.cern.ch/swift/v1/mlogs/run44)  | 221.23  | 141.45  | 140.37  | 139.80  | 139.53 | 139.46 | 144.05 |       |       |       |       |
-| 7       | 8       | 32      |         | No     | [Logs](https://s3.cern.ch/swift/v1/mlogs/run45)  | 223.29  | 153.24  | 147.85  | 145.78  | 145.90 | 145.85 | 145.70 |       |       |       |       |
-| 8       | 16      | 64      |         | No     | [Logs](https://s3.cern.ch/swift/v1/mlogs/run85)  | 189.46  | 61.90   | 61.68   | 61.66   | 61.69  | 62.12  | 61.75  | 62.46 | 64.36 | 62.81 |       |
-| 9       | 16      | 64      |         | Yes    | [Logs](https://s3.cern.ch/swift/v1/mlogs/run86)  | 350.96  | 61.65   | 61.61   | 63.69   | 61.95  | 62.35  | 61.83  | 62.45 | 61.53 | 62.04 |       |
-| 10      | 25      | 100     | 120     | No     | [Logs](https://s3.cern.ch/swift/v1/mlogs/run111) | 193.82  | 51.28   | 58.73   | 60.96   | 61.70  | 59.55  | 60.76  | 63.01 | 58.94 | 62.09 | 63.57 |
-| 11      | 16      | 64      | 120     | No     | [Logs](https://s3.cern.ch/swift/v1/mlogs/run112) | 186.20  | 79.93   | 81.18   | 80.67   | 80.66  | 80.35  | 80.33  | 81.64 | 80.72 | 81.60 | 80.94 |
+| Run | Nodes | Total GPUs | Total Epochs | AUTOTUNE | Logs                                             | Epoch 1 | Epoch 2 | Epoch 3 | Epoch 4 | Epoch 5 | Epoch 6 | Epoch 7 | Epoch 8 | Epoch 9 | Epoch 10 | Epoch 11  |
+| --- | ----- | ---------- | ------------ | -------- | ------------------------------------------------ | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | -------- | ----- |
+| 1   | 2     | 8          |              | No       | [Logs](https://s3.cern.ch/swift/v1/mlogs/run24)  | 568.91  | 496.91  | 496.83  |         |         |         |         |         |         |          |       |
+| 2   | 4     | 16         |              | No       | [Logs](https://s3.cern.ch/swift/v1/mlogs/run27)  | 322.49  | 248.47  | 248.54  |         |         |         |         |         |         |          |       |
+| 3   | 8     | 32         |              | No       | [Logs](https://s3.cern.ch/swift/v1/mlogs/run28)  | 200.84  | 126.81  | 126.21  |         |         |         |         |         |         |          |       |
+| 4   | 8     | 32         |              | No       | [Logs](https://s3.cern.ch/swift/v1/mlogs/run42)  | 214.19  | 138.51  | 141.33  | 138.16  | 138.04  |         |         |         |         |          |       |
+| 5   | 8     | 32         |              | No       | [Logs](https://s3.cern.ch/swift/v1/mlogs/run43)  | 201.20  | 125.12  | 126.29  | 127.03  | 127.21  | 128.30  | 128.64  |         |         |          |       |
+| 6   | 8     | 32         |              | No       | [Logs](https://s3.cern.ch/swift/v1/mlogs/run44)  | 221.23  | 141.45  | 140.37  | 139.80  | 139.53  | 139.46  | 144.05  |         |         |          |       |
+| 7   | 8     | 32         |              | No       | [Logs](https://s3.cern.ch/swift/v1/mlogs/run45)  | 223.29  | 153.24  | 147.85  | 145.78  | 145.90  | 145.85  | 145.70  |         |         |          |       |
+| 8   | 16    | 64         |              | No       | [Logs](https://s3.cern.ch/swift/v1/mlogs/run85)  | 189.46  | 61.90   | 61.68   | 61.66   | 61.69   | 62.12   | 61.75   | 62.46   | 64.36   | 62.81    |       |
+| 9   | 16    | 64         |              | Yes      | [Logs](https://s3.cern.ch/swift/v1/mlogs/run86)  | 350.96  | 61.65   | 61.61   | 63.69   | 61.95   | 62.35   | 61.83   | 62.45   | 61.53   | 62.04    |       |
+| 10  | 25    | 100        | 120          | No       | [Logs](https://s3.cern.ch/swift/v1/mlogs/run111) | 193.82  | 51.28   | 58.73   | 60.96   | 61.70   | 59.55   | 60.76   | 63.01   | 58.94   | 62.09    | 63.57 |
+| 11  | 16    | 64         | 120          | No       | [Logs](https://s3.cern.ch/swift/v1/mlogs/run112) | 186.20  | 79.93   | 81.18   | 80.67   | 80.66   | 80.35   | 80.33   | 81.64   | 80.72   | 81.60    | 80.94 |
 
 * Losses and generator weights
     * Run 10: https://cernbox.cern.ch/index.php/s/SVtfwUBdCBhqnZB
@@ -29,11 +29,11 @@ Using Standard_NC24rs_v3 (InfiniBand, 4 x NVIDIA V100, 24 vCPU, 448 mem.):
 
 #### Batch Size 64 without InfiniBand
 
-The times do not include testing times, only training times.
+The times do not include testing times, only training times. 
 
 Using Standard_NC24s_v3 (4 x NVIDIA V100, 24 vCPU, 448 mem.):
 
-Run | Nodes | Total GPUs | AUTOTUNE | Logs | Epoch 1 | Epoch 2 | Epoch 3 | Epoch 4 | Epoch 5 | Epoch 6 | Epoch 7 | Epoch 8 | Epoch 9 | Epoch 10 |
+| Run | Nodes | Total GPUs | AUTOTUNE | Logs | Epoch 1 | Epoch 2 | Epoch 3 | Epoch 4 | Epoch 5 | Epoch 6 | Epoch 7 | Epoch 8 | Epoch 9 | Epoch 10 |
 | ------- | ------- | ------- | ------- | ------------------------------------------------ | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ----- | ----- | ----- |
 | 1       | 2       | 8       | No      | [Logs](https://s3.cern.ch/swift/v1/mlogs/run25)  | 560.05  | 488.20  | 488.02  |         |         |         |         |       |       |       |
 | 2       | 4       | 16      | No      | [Logs](https://s3.cern.ch/swift/v1/mlogs/run26)  | 325.59  | 251.95  | 252.22  |         |         |         |         |       |       |       |
@@ -49,11 +49,11 @@ Run | Nodes | Total GPUs | AUTOTUNE | Logs | Epoch 1 | Epoch 2 | Epoch 3 | Epoch
 
 #### Batch Size 96 with InfiniBand
 
-The times do not include testing times, only training times.
+The times do not include testing times, only training times. 
 
 Using Standard_NC24rs_v3 (InfiniBand, 4 x NVIDIA V100, 24 vCPU, 448 mem.):
 
-Run  | Nodes | Total GPUs | Total Epochs | AUTOTUNE | prefetch or cache | Logs | Epoch 1 | Epoch 2 | Epoch 3 | Epoch 4 | Epoch 5 | Epoch 6 | Epoch 7 | Epoch 8 | Epoch 9 | Epoch 10 | Epoch 11 |
+|Run  | Nodes | Total GPUs | Total Epochs | AUTOTUNE | prefetch or cache | Logs | Epoch 1 | Epoch 2 | Epoch 3 | Epoch 4 | Epoch 5 | Epoch 6 | Epoch 7 | Epoch 8 | Epoch 9 | Epoch 10 | Epoch 11 |
 | ------- | ------- | ------- | ------- | ------- | ------- | ----------------------------------------------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- |
 | 1       | 6       | 24      |         | No      | No      | [Logs](https://s3.cern.ch/swift/v1/mlogs/run67) | 257.33  | 181.04  | 178.15  | 178.20  | 177.99  | 177.57  | 178.38  | 178.37  | 177.83  | 177.98  |         |
 | 2       | 8       | 32      |         | No      | No      | [Logs](https://s3.cern.ch/swift/v1/mlogs/run46) | 199.90  | 119.04  | 118.81  | 119.55  | 118.73  | 119.39  | 119.59  |         |         |         |         |
@@ -74,11 +74,11 @@ Run  | Nodes | Total GPUs | Total Epochs | AUTOTUNE | prefetch or cache | Logs |
 
 #### Batch Size 96 without InfiniBand
 
-The times do not include testing times, only training times.
+The times do not include testing times, only training times. 
 
 Using Standard_NC24s_v3 (4 x NVIDIA V100, 24 vCPU, 448 mem.):
 
-Run  | Nodes | Total GPUs | Total Epochs | AUTOTUNE | Logs | Epoch 1 | Epoch 2 | Epoch 3 | Epoch 4 | Epoch 5 | Epoch 6 | Epoch 7 | Epoch 8 | Epoch 9 | Epoch 10 | Epoch 11 |
+|Run  | Nodes | Total GPUs | Total Epochs | AUTOTUNE | Logs | Epoch 1 | Epoch 2 | Epoch 3 | Epoch 4 | Epoch 5 | Epoch 6 | Epoch 7 | Epoch 8 | Epoch 9 | Epoch 10 | Epoch 11 |
 | ------- | ------- | ------- | ------- | ----------- | ----------------------------------------------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------ |
 | 1       | 8       | 32      |         | No          | [Logs](https://s3.cern.ch/swift/v1/mlogs/run52) | 200.70  | 120.72  | 120.16  | 120.09  | 120.88  | 120.81  | 120.25  | 121.05  | 120.75  | 120.64  | 120.93 |
 | 2       | 8       | 32      |         | No          | [Logs](https://s3.cern.ch/swift/v1/mlogs/run53) | 203.47  | 120.45  | 122.69  | 120.95  | 120.62  | 120.31  | 120.76  | 120.21  | 120.38  | 120.95  |        |
@@ -91,11 +91,11 @@ Run  | Nodes | Total GPUs | Total Epochs | AUTOTUNE | Logs | Epoch 1 | Epoch 2 |
 
 #### Batch Size 32 with InfiniBand
 
-The times do not include testing times, only training times.
+The times do not include testing times, only training times. 
 
 Using Standard_NC24rs_v3 (InfiniBand, 4 x NVIDIA V100, 24 vCPU, 448 mem.):
 
-Run  | Nodes | Total GPUs | Total Epochs | AUTOTUNE | prefetch or cache | Logs | Epoch 1 | Epoch 2 | Epoch 3 | Epoch 4 | Epoch 5 | Epoch 6 | Epoch 7 | Epoch 8 | Epoch 9 | Epoch 10 | Epoch 11 |
+|Run  | Nodes | Total GPUs | Total Epochs | AUTOTUNE | prefetch or cache | Logs | Epoch 1 | Epoch 2 | Epoch 3 | Epoch 4 | Epoch 5 | Epoch 6 | Epoch 7 | Epoch 8 | Epoch 9 | Epoch 10 | Epoch 11 |
 | ------- | ------- | ------- | ------- | ------- | ------- | ----------------------------------------------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- |
 | 1       | 25      | 100     | 120     | No      | No      | [Logs](https://s3.cern.ch/swift/v1/mlogs/run96) | 193.95  | 69.37   | 69.45   | 69.95   | 69.57   | 70.02   | 70.16   | 69.73   | 69.93   | 69.61   | 69.53   |
 | 2       | 16      | 64      | 120     | No      | No      | [Logs](https://s3.cern.ch/swift/v1/mlogs/run98) | 188.40  | 108.16  | 107.97  | 111.05  | 107.88  | 108.10  | 107.97  | 109.76  | 108.27  | 108.02  | 108.09  |
@@ -103,15 +103,15 @@ Run  | Nodes | Total GPUs | Total Epochs | AUTOTUNE | prefetch or cache | Logs |
 * Losses and generator weights
     * Run 1: https://cernbox.cern.ch/index.php/s/qiQdx2PP4jw0USP
     * Run 2: https://cernbox.cern.ch/index.php/s/DySXYSE8DcZI43U
-
+    
 
 #### Batch Size 16 with InfiniBand
 
-The times do not include testing times, only training times.
+The times do not include testing times, only training times. 
 
 Using Standard_NC24rs_v3 (InfiniBand, 4 x NVIDIA V100, 24 vCPU, 448 mem.):
 
-Run  | Nodes | Total GPUs | Total Epochs | AUTOTUNE | prefetch or cache | Logs | Epoch 1 | Epoch 2 | Epoch 3 | Epoch 4 | Epoch 5 | Epoch 6 | Epoch 7 | Epoch 8 | Epoch 9 | Epoch 10 | Epoch 11 |
+|Run  | Nodes | Total GPUs | Total Epochs | AUTOTUNE | prefetch or cache | Logs | Epoch 1 | Epoch 2 | Epoch 3 | Epoch 4 | Epoch 5 | Epoch 6 | Epoch 7 | Epoch 8 | Epoch 9 | Epoch 10 | Epoch 11 |
 | ------- | ------- | ------- | ------- | ------- | ------- | ------------------------------------------------ | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- | ------- |
 | 1       | 25      | 100     | 120     | No      | No      | [Logs](https://s3.cern.ch/swift/v1/mlogs/run102) | 277.64  | 64.59   | 63.68   | 63.47   | 63.78   | 64.45   | 63.69   | 65.16   | 64.11   | 64.65   | 64.33   |
 | 2       | 16      | 64      | 120     | No      | No      | [Logs](https://s3.cern.ch/swift/v1/mlogs/run99)  | 199.39  | 91.92   | 92.01   | 91.67   | 91.92   | 92.31   | 92.22   | 92.16   | 91.98   | 91.95   | 92.04   |
