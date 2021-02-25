@@ -1,10 +1,20 @@
-# 3DGAN Results Microsoft Azure 
+# 3DGAN Results Microsoft Azure
 
-These runs were performed using Azure's [Machine Learning service](https://azure.microsoft.com/en-us/services/machine-learning/). 
+These runs were performed using Azure's [Machine Learning service](https://azure.microsoft.com/en-us/services/machine-learning/).
+
+The dataset can be downloaded from https://s3.cern.ch/swift/v1/gan-bucket/
+All the files under *tfrecordsprepro/* should be pulled.
+You can do so with aws-cli (version 1) as follows:
+
+```bash
+
+aws s3 sync --no-sign-request --endpoint-url https://s3.cern.ch s3://gan-bucket/tfrecordsprepro/ .
+
+```
 
 #### Batch Size 64 with InfiniBand
 
-The times do not include testing times, only training times. 
+The times do not include testing times, only training times.
 
 Using Standard_NC24rs_v3 (InfiniBand, 4 x NVIDIA V100, 24 vCPU, 448 mem.):
 
@@ -29,7 +39,7 @@ Using Standard_NC24rs_v3 (InfiniBand, 4 x NVIDIA V100, 24 vCPU, 448 mem.):
 
 #### Batch Size 64 without InfiniBand
 
-The times do not include testing times, only training times. 
+The times do not include testing times, only training times.
 
 Using Standard_NC24s_v3 (4 x NVIDIA V100, 24 vCPU, 448 mem.):
 
@@ -49,7 +59,7 @@ Using Standard_NC24s_v3 (4 x NVIDIA V100, 24 vCPU, 448 mem.):
 
 #### Batch Size 96 with InfiniBand
 
-The times do not include testing times, only training times. 
+The times do not include testing times, only training times.
 
 Using Standard_NC24rs_v3 (InfiniBand, 4 x NVIDIA V100, 24 vCPU, 448 mem.):
 
@@ -74,7 +84,7 @@ Using Standard_NC24rs_v3 (InfiniBand, 4 x NVIDIA V100, 24 vCPU, 448 mem.):
 
 #### Batch Size 96 without InfiniBand
 
-The times do not include testing times, only training times. 
+The times do not include testing times, only training times.
 
 Using Standard_NC24s_v3 (4 x NVIDIA V100, 24 vCPU, 448 mem.):
 
@@ -91,7 +101,7 @@ Using Standard_NC24s_v3 (4 x NVIDIA V100, 24 vCPU, 448 mem.):
 
 #### Batch Size 32 with InfiniBand
 
-The times do not include testing times, only training times. 
+The times do not include testing times, only training times.
 
 Using Standard_NC24rs_v3 (InfiniBand, 4 x NVIDIA V100, 24 vCPU, 448 mem.):
 
@@ -103,11 +113,11 @@ Using Standard_NC24rs_v3 (InfiniBand, 4 x NVIDIA V100, 24 vCPU, 448 mem.):
 * Losses and generator weights
     * Run 1: https://cernbox.cern.ch/index.php/s/qiQdx2PP4jw0USP
     * Run 2: https://cernbox.cern.ch/index.php/s/DySXYSE8DcZI43U
-    
+
 
 #### Batch Size 16 with InfiniBand
 
-The times do not include testing times, only training times. 
+The times do not include testing times, only training times.
 
 Using Standard_NC24rs_v3 (InfiniBand, 4 x NVIDIA V100, 24 vCPU, 448 mem.):
 

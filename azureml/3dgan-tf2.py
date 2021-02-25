@@ -7,6 +7,18 @@ from azureml.core import Dataset
 from azureml.core.runconfig import TensorflowConfiguration
 from configs import *
 
+
+if use_curated_env:
+    name = name + '-use_curated_env'
+else:
+    name = name + '-use_custom_env'
+if multi_node:
+    name = name + '-multi_node'
+else:
+    name = name + '-single_node'
+if use_prepro:
+    name = name + '-use_prepro'
+
 if region is "fr":
     wsCfgPath = ".azureml/config.json"
 
@@ -36,6 +48,13 @@ arguments = [
     '--batchsize', batch_size
 ]
 
+if use_autotune:
+    arguments.append('--autotune')
+if use_cache:
+    arguments.append('--use_cache')
+if use_prefetch:
+    arguments.append('--use_prefetch')
+
 if multi_node:
     distributed_job_config = TensorflowConfiguration(
         worker_count=worker_count,
@@ -46,7 +65,7 @@ if use_prepro:
     script = 'GPU_Version2_pp.py'
 
 config = ScriptRunConfig(
-    source_directory=pathToScript,
+    source_directory='src/',
     script=script,
     arguments=arguments,
     compute_target=cluster_name,
