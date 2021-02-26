@@ -35,6 +35,7 @@ import json
 import boto3
 import datetime
 import tarfile
+import subprocess
 
 #Configs
 config = tf.compat.v1.ConfigProto(log_device_placement=True)
@@ -1024,6 +1025,16 @@ for epoch in range(nb_epochs):
         client.upload_file(discriminator_weights_path, 'dejan', filename[:-4] + '_params_discriminator.hdf5')
 
     if do_profiling:
-        profiling_filename = 'tfjob-id-' + str(job_id) + '-epoch-' + str(epoch) + '-batchsize-' + str(batch_size) + '-taskindex-' + str(tf_config_dict['task']['index']) + '-' + str(timestamp) + '.tar.gz'
-        with tarfile.open(profiling_filename, "w:gz") as tar:
-            tar.add(outpath + profiling_dir, arcname=os.path.basename(outpath + profiling_dir))
+        print('os.path.basename(outpath + profiling_dir)')
+        print(os.path.basename(outpath + profiling_dir))
+        profiling_filename = '/tmp/tfjob-id-' + str(job_id) + '-profiling-taskindex-' + str(tf_config_dict['task']['index']) + '-' + str(timestamp) + '.tar.gz'
+        #with tarfile.open(profiling_filename, "w:gz") as tar:
+            #tar.add(outpath + profiling_dir, arcname=os.path.basename(outpath + profiling_dir))
+        subprocess.call(['tar', '-cpvzf', profiling_filename, outpath + profiling_dir])
+        os.system('ls /tmp')
+        print('Uploading tar...')
+        client.upload_file(profiling_filename, 'dejan', profiling_filename[5:])
+        print('Tar uploaded')
+
+        print('sleep')
+        time.sleep(30)
