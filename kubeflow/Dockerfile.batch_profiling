@@ -1,3 +1,3 @@
-FROM docker.io/dejangolubovic/gan3d:batch_profiling
+FROM registry.hub.docker.com/dejangolubovic/gan3d:batch_profiling
 COPY ganV2_preprocess.py /opt/ganV2_preprocess.py
 RUN chmod +x /opt/ganV2_preprocess.py
