@@ -1,6 +1,7 @@
 ARG IMAGE_TYPE="gpu"
 FROM docker.io/dejangolubovic/gan3d
 RUN pip3 install boto3 --user
+RUN pip uninstall -y enum34 && pip install --no-binary=:all: --force-reinstall numpy
 
 COPY gan.py /
 ADD gan.py /opt/gan.py
