@@ -1,0 +1,13 @@
+FROM tensorflow/tensorflow:2.4.1-gpu
+
+USER root
+COPY ganV2_preprocess.py /opt/ganV2_preprocess.py
+COPY ganV2_TPU.py /opt/ganV2_TPU.py
+
+RUN mkdir /model_outputs && \
+chmod -R 777 /model_outputs && \
+chmod +x /opt/ganV2_preprocess.py && \
+chmod +x /opt/ganV2_TPU.py && \
+mkdir /root/.aws
+
+COPY credentials /root/.aws/credentials
