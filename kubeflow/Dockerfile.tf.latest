@@ -1,4 +1,8 @@
 FROM tensorflow/tensorflow:2.4.1-gpu
+COPY requirements/requirements_new.txt /tmp/requirements.txt
+RUN apt-get -qq update && \
+/usr/bin/python3 -m pip install --upgrade pip && \
+pip3 install -r /tmp/requirements.txt
 
 USER root
 COPY ganV2_preprocess.py /opt/ganV2_preprocess.py
