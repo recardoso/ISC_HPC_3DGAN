@@ -518,34 +518,34 @@ else:
 if not use_gs:
     Trainfiles, Testfiles = DivideFiles(datapath, f, datasetnames=["ECAL"], Particles =[particle])
 if use_gs:
-    Trainfiles = ['gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_000.tfrecords',\
-                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_001.tfrecords',\
-                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_002.tfrecords',\
-                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_003.tfrecords',\
-                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_004.tfrecords',\
-                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_005.tfrecords',\
-                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_006.tfrecords',\
-                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_007.tfrecords',\
-                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_008.tfrecords',\
-                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_009.tfrecords',\
-                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_010.tfrecords',\
-                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_011.tfrecords',\
-                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_012.tfrecords',\
-                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_013.tfrecords',\
-                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_014.tfrecords',\
-                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_015.tfrecords',\
-                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_016.tfrecords',\
-                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_017.tfrecords',\
-                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_018.tfrecords',\
-                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_019.tfrecords',\
-                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_020.tfrecords',\
-                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_021.tfrecords',\
-                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_022.tfrecords',\
-                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_023.tfrecords',\
-                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_024.tfrecords']
-    Testfiles = ['gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_025.tfrecords',\
-                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_026.tfrecords',\
-                'gs://renato-tpu-bucket/tfrecordsprepoc/Ele_VarAngleMeas_100_200_027.tfrecords']
+    Trainfiles = ['gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_000.tfrecords',\
+                'gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_001.tfrecords',\
+                'gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_002.tfrecords',\
+                'gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_003.tfrecords',\
+                'gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_004.tfrecords',\
+                'gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_005.tfrecords',\
+                'gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_006.tfrecords',\
+                'gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_007.tfrecords',\
+                'gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_008.tfrecords',\
+                'gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_009.tfrecords',\
+                'gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_010.tfrecords',\
+                'gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_011.tfrecords',\
+                'gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_012.tfrecords',\
+                'gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_013.tfrecords',\
+                'gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_014.tfrecords',\
+                'gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_015.tfrecords',\
+                'gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_016.tfrecords',\
+                'gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_017.tfrecords',\
+                'gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_018.tfrecords',\
+                'gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_019.tfrecords',\
+                'gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_020.tfrecords',\
+                'gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_021.tfrecords',\
+                'gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_022.tfrecords',\
+                'gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_023.tfrecords',\
+                'gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_024.tfrecords']
+    Testfiles = ['gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_025.tfrecords',\
+                'gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_026.tfrecords',\
+                'gs://renato_bucket/3DGAN/tfrecordsprepoc/Ele_VarAngleMeas_100_200_027.tfrecords']
     
 
 print(Trainfiles)
