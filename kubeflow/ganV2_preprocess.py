@@ -88,7 +88,8 @@ os.environ['S3_ENDPOINT'] = 'https://s3.cern.ch'
 client = boto3.client('s3', endpoint_url='https://s3.cern.ch')
 
 tf_config_str = os.environ.get('TF_CONFIG')
-tf_config_dict  = json.loads(tf_config_str)
+if tf_config_str is not None:
+    tf_config_dict  = json.loads(tf_config_str)
 
 nb_epochs = args.nb_epochs #60 #Total Epochs
 is_full_training = args.is_full_training
@@ -1010,9 +1011,10 @@ for epoch in range(nb_epochs):
     epoch_metrics['batch-size'] = batch_size
     epoch_metrics['batch-size-per-replica'] = batch_size_per_replica
     epoch_metrics['num_replicas_in_sync'] = strategy.num_replicas_in_sync
-    epoch_metrics['n_workers'] = len(tf_config_dict['cluster']['worker'])
+    if tf_config_str is not None:
+        epoch_metrics['n_workers'] = len(tf_config_dict['cluster']['worker'])
 
-    if tf_config_dict['task']['index'] == 0:
+    if tf_config_str is None or tf_config_dict['task']['index'] == 0:
         timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H:%M:%S')
         filename = 'tfjob-id-' + str(job_id) + '-epoch-' + str(epoch) + '-batchsize-' + str(batch_size) + '-' + str(timestamp) + '.txt'
         with open(filename, 'w') as f:
@@ -1027,7 +1029,10 @@ for epoch in range(nb_epochs):
     if do_profiling:
         print('os.path.basename(outpath + profiling_dir)')
         print(os.path.basename(outpath + profiling_dir))
-        profiling_filename = '/tmp/tfjob-id-' + str(job_id) + '-profiling-taskindex-' + str(tf_config_dict['task']['index']) + '-' + str(timestamp) + '.tar.gz'
+        if tf_config_str is not None:
+            profiling_filename = '/tmp/tfjob-id-' + str(job_id) + '-profiling-taskindex-' + str(tf_config_dict['task']['index']) + '-' + str(timestamp) + '.tar.gz'
+        else:
+            profiling_filename = '/tmp/tfjob-id-' + str(job_id) + '-profiling-taskindex-' + str(timestamp) + '.tar.gz'
         #with tarfile.open(profiling_filename, "w:gz") as tar:
             #tar.add(outpath + profiling_dir, arcname=os.path.basename(outpath + profiling_dir))
         subprocess.call(['tar', '-cpvzf', profiling_filename, outpath + profiling_dir])
